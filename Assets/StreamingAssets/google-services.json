@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "689308178980",
+    "firebase_url": "https://dialogue-rpg-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "dialogue-rpg",
+    "storage_bucket": "dialogue-rpg.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:689308178980:android:aaa3902318c0e7574b96b1",
+        "android_client_info": {
+          "package_name": "com.JoelRobinson.Dialogue"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "689308178980-43tasrjn6pfkm5blsedr5ge82d1fbu80.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDCYqnjRPNwMkgKckBsfFOSIMCiXfnKG34"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "689308178980-43tasrjn6pfkm5blsedr5ge82d1fbu80.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
