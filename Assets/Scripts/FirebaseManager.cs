@@ -29,7 +29,10 @@ public class FirebaseManager : MonoBehaviour
 
     [Header("UserData")]
     public TMP_Text usernameField;
+
+    //Script references
     public PlayerData playerData;
+    public Campaigns campaigns;
 
 
     void Awake()
@@ -47,19 +50,20 @@ public class FirebaseManager : MonoBehaviour
             }
         });
 
-        playerData = GameObject.Find("PlayerDataManager").GetComponent<PlayerData>();
+        //playerData = GameObject.Find("PlayerDataManager").GetComponent<PlayerData>();
+
     }
 
     void Start()
     {
-        if(PlayerPrefs.HasKey("UserEmail") && PlayerPrefs.HasKey("UserPassword"))
+        if (PlayerPrefs.HasKey("UserEmail") && PlayerPrefs.HasKey("UserPassword"))
         {
             Debug.Log("auto login");
             StartCoroutine(AutoLogin());
         }
         else
         {
-            Debug.Log("Whoopsie");
+            Debug.Log("No Login Data Saved");
         }
     }
 
@@ -106,7 +110,7 @@ public class FirebaseManager : MonoBehaviour
     public void SignOutButton()
     {
         auth.SignOut();
-        UIManager.instance.LoginScreen();
+        UIManager.instance.LoadScreen(0);
         ClearLoginFields();
         ClearRegisterFields();
     }
@@ -174,12 +178,12 @@ public class FirebaseManager : MonoBehaviour
             Debug.LogFormat("User signed in successfully: {0} ({1})", User.DisplayName, User.Email);
             warningLoginText.text = "";
             confirmLoginText.text = "Logged in";
-            StartCoroutine(LoadUserData());
+            Load();
 
             yield return new WaitForSeconds(1.5f);
 
             usernameField.text = User.DisplayName + "'s Campaigns";
-            UIManager.instance.UserDataScreen();
+            UIManager.instance.LoadScreen(2);
             confirmLoginText.text = "";
             ClearLoginFields();
             ClearRegisterFields();
@@ -263,7 +267,7 @@ public class FirebaseManager : MonoBehaviour
                     else
                     {
                         //username is set
-                        UIManager.instance.LoginScreen();
+                        UIManager.instance.LoadScreen(3);
                         warningRegisterText.text = "";
                         ClearLoginFields();
                         ClearRegisterFields();
@@ -312,10 +316,11 @@ public class FirebaseManager : MonoBehaviour
 
     public void Load()
     {
-        StartCoroutine(LoadUserData());
+        StartCoroutine(GetCampaignKeys());
+
     }
 
-    IEnumerator LoadUserData()
+    IEnumerator GetCampaignKeys()
     {
         var DBTask = db.Child("users").Child(User.UserId).GetValueAsync();
         yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
@@ -335,20 +340,71 @@ public class FirebaseManager : MonoBehaviour
 
             Debug.Log("User campaigns:" + snapshot.Child("campaigns").ChildrenCount.ToString());
 
-            foreach(var child in snapshot.Child("campaigns").Children)
+            playerData.campaignKeys.Clear(); //Clearing campaigns from the array so that they can be readded in order when refreshing
+            playerData.campaignTitles.Clear();
+            playerData.campaignGenres.Clear();
+            playerData.campaignGms.Clear();
+
+            foreach (var child in snapshot.Child("campaigns").Children)
             {
-                playerData.campaigns.Add(child.Key.ToString());
+                playerData.campaignKeys.Add(child.Value.ToString());
+                StartCoroutine(GetCampaignData(child.Value.ToString()));
             }
 
             yield return new WaitForSeconds(1f);
+
+            campaigns.Refresh();
+        }
+    }
+
+    IEnumerator GetCampaignData(string key)
+    {
+        var DBTask = db.Child("campaigns").Child(key).GetValueAsync();
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else if (DBTask.Result.Value == null)
+        {
+            Debug.Log("This user has no data");
+        }
+        else
+        {
+            //data retrieved
+            DataSnapshot snapshot = DBTask.Result;
+
+            foreach (var child in snapshot.Children)
+            {
+                switch (child.Key)
+                {
+                    case "title":
+                        playerData.campaignTitles.Add(child.Value.ToString());
+                        break;
+                    case "genre":
+                        playerData.campaignGenres.Add(child.Value.ToString());
+                        break;
+                    case "gamemaster":
+                        playerData.campaignGms.Add(child.Value.ToString());
+                        break;
+                    default:
+                        Debug.Log("No save location for " + child.Key);
+                        break;
+                }
+
+            }
+
+            Debug.Log("All campaign data loaded");
+
         }
     }
 
     //Campaign stuff
 
-    public void CreateCampaign()
+    public void CreateCampaign(string name, string genre)
     {
-        StartCoroutine(NewCampaign("The Test", "Fantasy", User.DisplayName));
+        StartCoroutine(NewCampaign(name, genre, User.DisplayName));
     }
 
     IEnumerator NewCampaign(string name, string genre, string gameMaster)
@@ -373,9 +429,10 @@ public class FirebaseManager : MonoBehaviour
         else
         {
             Debug.Log("New Campaign created");
+            campaigns.Refresh();
         }
     }
-    
+
     void HandleValueChanged(object sender, ValueChangedEventArgs args)
     {
         if (args.DatabaseError != null)

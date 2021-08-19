@@ -12,8 +12,17 @@ public class PlayerData : MonoBehaviour
     public string UID;
 
     [Header("Campaigns")]
-    public List<string> campaigns;
-    public bool gameMaster;
+    public List<string> campaignKeys;
+    public List<string> campaignTitles;
+    public List<string> campaignGms;
+    public List<string> campaignGenres;
+    //public bool gameMaster;
+
+    [Header("New Campaign Temp Data")]
+    public string gameMaster;
+    public string genre;
+    public string campaignName;
+
 
     // Start is called before the first frame update
     void Start()

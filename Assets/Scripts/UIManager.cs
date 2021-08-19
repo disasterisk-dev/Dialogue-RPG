@@ -8,9 +8,7 @@ public class UIManager : MonoBehaviour
     public static UIManager instance;
 
     //Screen object variables
-    public GameObject loginUI;
-    public GameObject registerUI;
-    public GameObject userDataUI;
+    public GameObject [] screens;
 
     Campaigns campaigns;
 
@@ -26,35 +24,24 @@ public class UIManager : MonoBehaviour
             Destroy(this);
         }
 
-        campaigns = userDataUI.GetComponent<Campaigns>();
+        //campaigns = GameObject.Find("Campaigns").GetComponent<Campaigns>();
 
-        LoginScreen();
+        LoadScreen(0);
     }
 
     //Functions to change the login screen UI
 
     public void ClearScreen() //Turn off all screens
     {
-        loginUI.SetActive(false);
-        registerUI.SetActive(false);
-        userDataUI.SetActive(false);
+        foreach(GameObject obj in screens)
+        {
+            obj.SetActive(false);
+        }
     }
 
-    public void LoginScreen() //Back button
+    public void LoadScreen(int i)
     {
         ClearScreen();
-        loginUI.SetActive(true);
-    }
-    public void RegisterScreen() // Regester button
-    {
-        ClearScreen();
-        registerUI.SetActive(true);
-    }
-
-    public void UserDataScreen() //Logged in
-    {
-        campaigns.Refresh();
-        ClearScreen();
-        userDataUI.SetActive(true);
+        screens[i].SetActive(true);
     }
 }

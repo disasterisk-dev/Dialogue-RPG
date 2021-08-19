@@ -12,16 +12,31 @@ public class CampaignCard : MonoBehaviour
 
     [Header("Data")]
     public string campaignName;
+    public string key;
     public string gmName;
-    public string [] playerNames;
+    public string[] playerNames;
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
+    }
+
+    public void SetData()
+    {
+        try
+        {
+            title.text = campaignName;
+            gameMaster.text = gmName + "'s";
+            players.text = playerNames[1];
+        }
+        catch
+        {
+            Debug.Log("bitch ass exception strikes again");
+        }
     }
 }

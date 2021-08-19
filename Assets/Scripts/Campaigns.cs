@@ -7,7 +7,7 @@ public class Campaigns : MonoBehaviour
     public PlayerData playerData;
 
     [Header("UICards")]
-    public GameObject [] zones;
+    public GameObject[] zones;
 
     [Header("Prefabs")]
     public GameObject NewCampaign;
@@ -21,29 +21,47 @@ public class Campaigns : MonoBehaviour
     // Update is called once per frame
     void Awake()
     {
-        playerData = GameObject.Find("PlayerDataManager").GetComponent<PlayerData>();
+        //Refresh();
     }
 
     public void Refresh()
     {
-        if (playerData.campaigns.Count == 0)
+
+        playerData = GameObject.Find("PlayerDataManager").GetComponent<PlayerData>();
+
+        foreach (GameObject obj in zones)
+        {
+            if (obj.transform.childCount > 0)
+            {
+                Destroy(obj.transform.GetChild(0).gameObject);
+            }
+        }
+
+        if (playerData.campaignKeys.Count == 0)
         {
             Instantiate(NewCampaign, zones[0].transform);
         }
         else
         {
-            for(int i = 0; i < playerData.campaigns.Count; i++)
+            for (int i = 0; i < playerData.campaignKeys.Count; i++)
             {
                 GameObject card = Instantiate(CampaignCard, zones[i].transform);
                 CampaignCard campaign = card.GetComponent<CampaignCard>();
 
-                //campaign.title.text = 
+                campaign.key = playerData.campaignKeys[i];
+                campaign.campaignName = playerData.campaignTitles[i];
+                campaign.gmName = playerData.campaignGms[i];
+
+                campaign.SetData();
             }
 
-            if(playerData.campaigns.Count < 4)
+            Debug.Log("Campaign cards loaded");
+
+            if (playerData.campaignKeys.Count < 4)
             {
-                Instantiate(NewCampaign, zones[playerData.campaigns.Count].transform);
+                Instantiate(NewCampaign, zones[playerData.campaignKeys.Count].transform);
             }
         }
+
     }
 }
