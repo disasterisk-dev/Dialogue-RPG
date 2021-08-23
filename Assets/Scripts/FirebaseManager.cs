@@ -4,6 +4,7 @@ using UnityEngine;
 using Firebase;
 using Firebase.Database;
 using Firebase.Auth;
+using UnityEngine.UI;
 using TMPro;
 
 public class FirebaseManager : MonoBehaviour
@@ -19,6 +20,8 @@ public class FirebaseManager : MonoBehaviour
     public TMP_InputField passwordLoginField;
     public TMP_Text warningLoginText;
     public TMP_Text confirmLoginText;
+    public Button loginButton;
+    public Button registerButton;
 
     [Header("Register")]
     public TMP_InputField usernameRegisterField;
@@ -113,6 +116,13 @@ public class FirebaseManager : MonoBehaviour
         UIManager.instance.LoadScreen(0);
         ClearLoginFields();
         ClearRegisterFields();
+
+        loginButton.gameObject.SetActive(true);
+        registerButton.gameObject.SetActive(true);
+        warningLoginText.gameObject.SetActive(false);
+
+        PlayerPrefs.DeleteKey("UserEmail");
+        PlayerPrefs.DeleteKey("UserPassword");
     }
 
     public void SaveDataButton()
@@ -128,7 +138,11 @@ public class FirebaseManager : MonoBehaviour
         emailLoginField.text = PlayerPrefs.GetString("UserEmail");
         passwordLoginField.text = PlayerPrefs.GetString("UserPassword");
 
-        yield return new WaitForSeconds(1.5f);
+        loginButton.gameObject.SetActive(false);
+        registerButton.gameObject.SetActive(false);
+        warningLoginText.gameObject.SetActive(true);
+
+        yield return new WaitForSeconds(0.5f);
 
         StartCoroutine(Login(emailLoginField.text, passwordLoginField.text));
     }
@@ -430,6 +444,67 @@ public class FirebaseManager : MonoBehaviour
         {
             Debug.Log("New Campaign created");
             campaigns.Refresh();
+        }
+    }
+
+    public void DeleteCampaign(string key)
+    {
+        StartCoroutine(DeleteCampaignIenum(key));
+    }
+
+    IEnumerator DeleteCampaignIenum(string key)
+    {
+        var DBTask = db.Child("campaigns").Child(key).RemoveValueAsync();
+
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else
+        {
+            foreach (string cKey in playerData.campaignKeys)
+            {
+                if (cKey == key)
+                {
+                    Debug.Log("For loop is triggering properly: " + cKey);
+                    //db.Child("users").Child(User.UserId).Child("campaigns").Child(cKey).RemoveValueAsync();
+                    StartCoroutine(DeleteCampaignEntry(cKey));
+                    Load();
+
+                    //campaigns.Refresh();
+                }
+            }
+            Debug.Log("Campaign Deleted");
+            //campaigns.Refresh();
+        }
+    }
+
+    IEnumerator DeleteCampaignEntry(string cKey)
+    {
+        var DBTask = db.Child("users").Child(User.UserId).Child("campaigns").GetValueAsync();
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else if (DBTask.Result.Value == null)
+        {
+            Debug.Log("This user has no data");
+        }
+        else
+        {
+            DataSnapshot snapshot = DBTask.Result;
+
+            foreach (var child in snapshot.Children)
+            {
+                if(child.Value.ToString() == cKey)
+                {
+                    db.Child("users").Child(User.UserId).Child("campaigns").Child(child.Key).RemoveValueAsync();
+                }
+            }
         }
     }
 

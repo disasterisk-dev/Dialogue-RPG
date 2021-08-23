@@ -33,6 +33,7 @@ public class NewCampaign : MonoBehaviour
     public void Create()
     {
         fm.CreateCampaign(nameInput.text, playerData.genre);
+        nameInput.text = "";
         fm.Load();
         uIManager.LoadScreen(2); //loads campaign screen
     }
