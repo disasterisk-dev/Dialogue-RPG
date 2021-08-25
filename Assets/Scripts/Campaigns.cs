@@ -50,7 +50,9 @@ public class Campaigns : MonoBehaviour
 
                 campaign.key = playerData.campaignKeys[i];
                 campaign.campaignName = playerData.campaignTitles[i];
-                campaign.gmName = playerData.campaignGms[i];
+                campaign.genre = playerData.campaignGenres[i];
+                campaign.gmName = playerData.campaignGmNames[i];
+                campaign.gmId = playerData.campaignGmIds[i];
 
                 campaign.SetData();
             }

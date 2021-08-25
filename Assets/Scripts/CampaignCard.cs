@@ -11,11 +11,14 @@ public class CampaignCard : MonoBehaviour
     public TMP_Text title;
     public TMP_Text gameMaster;
     public TMP_Text players;
+    public GameObject text;
 
     [Header("Data")]
     public string campaignName;
     public string key;
     public string gmName;
+    public string gmId;
+    public string genre;
     public string[] playerNames;
     void Start()
     {
@@ -35,6 +38,8 @@ public class CampaignCard : MonoBehaviour
             title.text = campaignName;
             gameMaster.text = gmName + "'s";
             players.text = playerNames[1];
+
+            //text.SetActive(true);
         }
         catch
         {

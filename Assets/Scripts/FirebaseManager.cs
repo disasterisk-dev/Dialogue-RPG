@@ -280,8 +280,10 @@ public class FirebaseManager : MonoBehaviour
                     }
                     else
                     {
+                        db.Child("users").Child(User.UserId).Child("username").SetValueAsync(_username);
+                        db.Child("users").Child(User.UserId).Child("email").SetValueAsync(_email);
                         //username is set
-                        UIManager.instance.LoadScreen(3);
+                        UIManager.instance.LoadScreen(2);
                         warningRegisterText.text = "";
                         ClearLoginFields();
                         ClearRegisterFields();
@@ -357,7 +359,8 @@ public class FirebaseManager : MonoBehaviour
             playerData.campaignKeys.Clear(); //Clearing campaigns from the array so that they can be readded in order when refreshing
             playerData.campaignTitles.Clear();
             playerData.campaignGenres.Clear();
-            playerData.campaignGms.Clear();
+            playerData.campaignGmNames.Clear();
+            playerData.campaignGmIds.Clear();
 
             foreach (var child in snapshot.Child("campaigns").Children)
             {
@@ -400,7 +403,10 @@ public class FirebaseManager : MonoBehaviour
                         playerData.campaignGenres.Add(child.Value.ToString());
                         break;
                     case "gamemaster":
-                        playerData.campaignGms.Add(child.Value.ToString());
+                        playerData.campaignGmNames.Add(child.Value.ToString());
+                        break;
+                    case "players":
+                        playerData.campaignGmIds.Add(child.Child("GM").Value.ToString());
                         break;
                     default:
                         Debug.Log("No save location for " + child.Key);
@@ -500,9 +506,47 @@ public class FirebaseManager : MonoBehaviour
 
             foreach (var child in snapshot.Children)
             {
-                if(child.Value.ToString() == cKey)
+                if (child.Value.ToString() == cKey)
                 {
                     db.Child("users").Child(User.UserId).Child("campaigns").Child(child.Key).RemoveValueAsync();
+                }
+            }
+        }
+    }
+
+    public void Invite(string email)
+    {
+        StartCoroutine(InvitePlayer(email));
+    }
+
+    IEnumerator InvitePlayer(string email)
+    {
+        var DBTask = db.Child("users").GetValueAsync();
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else if (DBTask.Result.Value == null)
+        {
+            Debug.Log("This user has no data");
+        }
+        else
+        {
+            DataSnapshot snapshot = DBTask.Result;
+
+            foreach (var child in snapshot.Children)
+            {
+                //Debug.Log(child.Child("email").Value.ToString());
+
+                if (child.Child("email").Value.ToString() == email)
+                {
+                    Debug.Log("Email found");
+                    string inviteKey = db.Child("users").Child(child.Key).Child("invites").Push().Key;
+
+                    db.Child("users").Child(child.Key).Child("invites").Child(inviteKey).Child("campaign").SetValueAsync(playerData.key);
+                    db.Child("users").Child(child.Key).Child("invites").Child(inviteKey).Child("gamemaster").SetValueAsync(User.DisplayName);
                 }
             }
         }

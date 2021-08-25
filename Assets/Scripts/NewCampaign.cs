@@ -26,13 +26,13 @@ public class NewCampaign : MonoBehaviour
 
     public void Genre(string genre)
     {
-        playerData.genre = genre;
+        playerData.tempGenre = genre;
         uIManager.LoadScreen(4);
     }
 
     public void Create()
     {
-        fm.CreateCampaign(nameInput.text, playerData.genre);
+        fm.CreateCampaign(nameInput.text, playerData.tempGenre);
         nameInput.text = "";
         fm.Load();
         uIManager.LoadScreen(2); //loads campaign screen
