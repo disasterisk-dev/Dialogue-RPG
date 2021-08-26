@@ -36,6 +36,7 @@ public class FirebaseManager : MonoBehaviour
     //Script references
     public PlayerData playerData;
     public Campaigns campaigns;
+    public Invites invites;
 
 
     void Awake()
@@ -333,7 +334,7 @@ public class FirebaseManager : MonoBehaviour
     public void Load()
     {
         StartCoroutine(GetCampaignKeys());
-
+        StartCoroutine(GetInviteKeys());
     }
 
     IEnumerator GetCampaignKeys()
@@ -536,22 +537,169 @@ public class FirebaseManager : MonoBehaviour
         {
             DataSnapshot snapshot = DBTask.Result;
 
+            bool playerFound = false;
+            bool messageSent = false;
+            ActiveCampaign activeCampaign = GameObject.Find("Gameplay").GetComponent<ActiveCampaign>();
+
             foreach (var child in snapshot.Children)
             {
                 //Debug.Log(child.Child("email").Value.ToString());
 
-                if (child.Child("email").Value.ToString() == email)
+                if (child.Child("email").Value.ToString() == email) //finds user matching the email entered
                 {
+                    playerFound = true;
                     Debug.Log("Email found");
-                    string inviteKey = db.Child("users").Child(child.Key).Child("invites").Push().Key;
 
-                    db.Child("users").Child(child.Key).Child("invites").Child(inviteKey).Child("campaign").SetValueAsync(playerData.key);
-                    db.Child("users").Child(child.Key).Child("invites").Child(inviteKey).Child("gamemaster").SetValueAsync(User.DisplayName);
+                    if (child.Child("invites").ChildrenCount < 4) //checks if found user has less than 4 invites already
+                    {
+                        string inviteKey = db.Child("users").Child(child.Key).Child("invites").Push().Key;
+
+                        db.Child("users").Child(child.Key).Child("invites").Child(inviteKey).Child("key").SetValueAsync(playerData.key);
+                        db.Child("users").Child(child.Key).Child("invites").Child(inviteKey).Child("title").SetValueAsync(playerData.campaignName);
+                        db.Child("users").Child(child.Key).Child("invites").Child(inviteKey).Child("gamemaster").SetValueAsync(User.DisplayName);
+
+                        activeCampaign.InviteInfo(0);
+                        messageSent = true;
+                    }
+                    else
+                    {
+                        activeCampaign.InviteInfo(2);
+                        messageSent = true;
+                    }
                 }
+            }
+
+            if (!playerFound && !messageSent)
+            {
+                activeCampaign.InviteInfo(1);
+            }
+            else if (playerFound && !messageSent)
+            {
+                activeCampaign.InviteInfo(6);
             }
         }
     }
 
+    IEnumerator GetInviteKeys()
+    {
+        var DBTask = db.Child("users").Child(User.UserId).GetValueAsync();
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else if (DBTask.Result.Value == null)
+        {
+            Debug.Log("This user has no data");
+        }
+        else
+        {
+            //data retrieved
+            DataSnapshot snapshot = DBTask.Result;
+
+            Debug.Log("User Invites:" + snapshot.Child("invites").ChildrenCount.ToString());
+
+            playerData.inviteEntryKeys.Clear();
+            playerData.inviteKeys.Clear(); //Clearing invites from the array so that they can be readded in order when refreshing
+            playerData.inviteTitles.Clear();
+            playerData.inviteGms.Clear();
+
+            foreach (var child in snapshot.Child("invites").Children)
+            {
+                string iKey = child.Key.ToString();
+                playerData.inviteEntryKeys.Add(iKey);
+
+                foreach (var iChild in snapshot.Child("invites").Child(iKey).Children)
+                {
+                    switch (iChild.Key)
+                    {
+                        case "key":
+                            playerData.inviteKeys.Add(iChild.Value.ToString());
+                            break;
+                        case "title":
+                            playerData.inviteTitles.Add(iChild.Value.ToString());
+                            break;
+                        case "gamemaster":
+                            playerData.inviteGms.Add(iChild.Value.ToString());
+                            break;
+                        default:
+                            Debug.Log("No save location for " + iChild.Key);
+                            break;
+                    }
+                }
+
+                Debug.Log("All invite data loaded");
+            }
+
+            yield return new WaitForSeconds(1f);
+
+            invites.Refresh();
+        }
+    }
+
+    public void Accept(string key, string eKey)
+    {
+        StartCoroutine(AcceptInvite(key, eKey));
+    }
+    IEnumerator AcceptInvite(string key, string eKey)
+    {
+        string userKey = db.Child("users").Child(User.UserId).Child("campaigns").Push().Key;
+
+        var DBTask = db.Child("users").Child(User.UserId).Child("campaigns").Child(userKey).SetValueAsync(key);
+
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else
+        {
+            Debug.Log("Joined Campaign");
+            StartCoroutine(DeleteInvite(eKey));
+        }
+    }
+
+    public void Decline(string eKey)
+    {
+        StartCoroutine(DeleteInvite(eKey));
+    }
+
+    IEnumerator DeleteInvite(string key)
+    {
+        var DBTask = db.Child("users").Child(User.UserId).Child("invites").GetValueAsync();
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else if (DBTask.Result.Value == null)
+        {
+            Debug.Log("This user has no data");
+        }
+        else
+        {
+            DataSnapshot snapshot = DBTask.Result;
+
+            foreach (var child in snapshot.Children)
+            {
+                if (child.Key.ToString() == key)
+                {
+                    Debug.Log("Deleted invite");
+                    db.Child("users").Child(User.UserId).Child("invites").Child(key).RemoveValueAsync();
+
+                    playerData.inviteEntryKeys.Remove(key);
+                    playerData.inviteKeys.RemoveAt(playerData.inviteEntryKeys.IndexOf(key));
+                    playerData.inviteTitles.RemoveAt(playerData.inviteEntryKeys.IndexOf(key));
+                    playerData.inviteGms.RemoveAt(playerData.inviteEntryKeys.IndexOf(key));
+                }
+            }
+
+            invites.Refresh();
+        }
+    }
     void HandleValueChanged(object sender, ValueChangedEventArgs args)
     {
         if (args.DatabaseError != null)

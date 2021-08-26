@@ -251,7 +251,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5377650853790804936}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6867234548167134577}
+        m_MethodName: Accept
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &3114551825580750201
 GameObject:
   m_ObjectHideFlags: 0
@@ -503,7 +514,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7369070606317641731}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6867234548167134577}
+        m_MethodName: Decline
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &6798043516541205804
 GameObject:
   m_ObjectHideFlags: 0
@@ -714,7 +736,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 218, y: -856}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 300, y: 450}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4892386450721093029
@@ -824,8 +846,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac059264a480dc54484c603d19da378b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameMaster: {fileID: 0}
-  title: {fileID: 0}
+  gameMasterText: {fileID: 1169417195411601466}
+  titleText: {fileID: 7526798872903586591}
+  gameMaster: 
+  title: 
+  key: 
+  entryKey: 
 --- !u!1 &9164497802899907628
 GameObject:
   m_ObjectHideFlags: 0

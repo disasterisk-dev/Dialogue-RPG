@@ -4,8 +4,15 @@ using UnityEngine;
 using TMPro;
 public class Invitation : MonoBehaviour
 {
-    public TMP_Text gameMaster;
-    public TMP_Text title;
+    FirebaseManager firebaseManager;
+    PlayerData playerData;
+    public TMP_Text gameMasterText;
+    public TMP_Text titleText;
+
+    public string gameMaster;
+    public string title;
+    public string key;
+    public string entryKey;
 
     // Start is called before the first frame update
     void Start()
@@ -21,11 +28,19 @@ public class Invitation : MonoBehaviour
 
     public void Accept()
     {
+        firebaseManager = GameObject.Find("FirebaseManager").GetComponent<FirebaseManager>();
 
+        firebaseManager.Accept(key, entryKey);
+
+        Destroy(gameObject);
     }
 
     public void Decline()
     {
-        
+        firebaseManager = GameObject.Find("FirebaseManager").GetComponent<FirebaseManager>();
+        playerData = GameObject.Find("PlayerDataManager").GetComponent<PlayerData>();
+
+        firebaseManager.Decline(entryKey);
+        Destroy(gameObject);
     }
 }

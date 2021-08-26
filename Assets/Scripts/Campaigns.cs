@@ -16,6 +16,14 @@ public class Campaigns : MonoBehaviour
     void Start()
     {
         playerData = GameObject.Find("PlayerDataManager").GetComponent<PlayerData>();
+
+        // foreach (GameObject obj in zones)
+        // {
+        //     if (obj.transform.childCount > 0)
+        //     {
+        //         Destroy(obj.transform.GetChild(0).gameObject);
+        //     }
+        // }
     }
 
     // Update is called once per frame
@@ -33,7 +41,10 @@ public class Campaigns : MonoBehaviour
         {
             if (obj.transform.childCount > 0)
             {
-                Destroy(obj.transform.GetChild(0).gameObject);
+                foreach(Transform child in obj.transform)
+                {
+                    Destroy(child.gameObject);
+                }
             }
         }
 

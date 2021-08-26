@@ -20,9 +20,11 @@ public class ActiveCampaign : MonoBehaviour
 
 
     [Header("Settings UI Elements")]
-    public GameObject settings;
+    public GameObject gmSettings;
+    public GameObject playerSettings;
     public GameObject invite;
     public TMP_InputField inviteField;
+    public TMP_Text inviteInfo;
 
     void OnEnable()
     {
@@ -33,8 +35,11 @@ public class ActiveCampaign : MonoBehaviour
         gm = playerData.gm;
 
         title.text = campaignName;
-        settings.SetActive(false);
+        gmSettings.SetActive(false);
+        playerSettings.SetActive(false);
         invite.SetActive(false);
+        inviteInfo.gameObject.SetActive(false);
+
     }
 
     void Awake()
@@ -50,13 +55,27 @@ public class ActiveCampaign : MonoBehaviour
 
     public void Settings()
     {
-        if (!settings.activeInHierarchy)
+        if (gm)
         {
-            settings.SetActive(true);
+            if (!gmSettings.activeInHierarchy)
+            {
+                gmSettings.SetActive(true);
+            }
+            else if (gmSettings.activeInHierarchy)
+            {
+                gmSettings.SetActive(false);
+            }
         }
-        else if (settings.activeInHierarchy)
+        else
         {
-            settings.SetActive(false);
+            if (!playerSettings.activeInHierarchy)
+            {
+                playerSettings.SetActive(true);
+            }
+            else if (playerSettings.activeInHierarchy)
+            {
+                playerSettings.SetActive(false);
+            }
         }
     }
 
@@ -72,6 +91,7 @@ public class ActiveCampaign : MonoBehaviour
     public void ShowInvite()
     {
         invite.SetActive(true);
+        inviteInfo.gameObject.SetActive(false);
     }
 
     public void Invite()
@@ -90,6 +110,29 @@ public class ActiveCampaign : MonoBehaviour
         {
             Debug.Log("No email entered");
         }
+    }
+
+    public void InviteInfo(int output)
+    {
+        switch (output)
+        {
+            case 0:
+                inviteInfo.text = "Invite sent!";
+                break;
+            case 1:
+                inviteInfo.text = "Player not found";
+                break;
+            case 2:
+                inviteInfo.text = "Player's inbox is full";
+                break;
+            case 3:
+                inviteInfo.text = "Invalid email entered";
+                break;
+            default:
+                inviteInfo.text = "Something went wrong";
+                break;
+        }
+        inviteInfo.gameObject.SetActive(true);
     }
 
 }

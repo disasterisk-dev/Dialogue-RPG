@@ -25,6 +25,12 @@ public class PlayerData : MonoBehaviour
     public List<string> campaignGenres;
     //public bool gameMaster;
 
+    [Header("Invites")]
+    public List<string> inviteEntryKeys;
+    public List<string> inviteKeys;
+    public List<string> inviteTitles;
+    public List<string> inviteGms;
+
     [Header("New Campaign Temp Data")]
     public string tempGameMaster;
     public string tempGenre;
