@@ -37,7 +37,7 @@ public class FirebaseManager : MonoBehaviour
     public PlayerData playerData;
     public Campaigns campaigns;
     public Invites invites;
-
+    public ActiveCampaign activeCampaign;
 
     void Awake()
     {
@@ -83,7 +83,33 @@ public class FirebaseManager : MonoBehaviour
         .ValueChanged += HandleValueChanged;
     }
 
-    //Reset all fields when needed
+    //Data change detection
+    void HandleValueChanged(object sender, ValueChangedEventArgs args)
+    {
+        if (args.DatabaseError != null)
+        {
+            Debug.LogError(args.DatabaseError.Message);
+            return;
+        }
+
+        Debug.Log("data had changed");
+
+        // DataSnapshot snapshot = args.Snapshot;
+
+        if (PlayerPrefs.HasKey("UserEmail"))
+        {
+            try
+            {
+                Load();
+            }
+            catch
+            {
+                Debug.Log("Don't like that");
+            }
+        }
+    }
+
+    //Login Stuff
 
     public void ClearLoginFields()
     {
@@ -132,8 +158,6 @@ public class FirebaseManager : MonoBehaviour
         StartCoroutine(UpdateUsernameDatabase(usernameField.text));
     }
 
-    //Automatically recovers login data from player prefs and logs user in
-
     IEnumerator AutoLogin()
     {
         emailLoginField.text = PlayerPrefs.GetString("UserEmail");
@@ -148,7 +172,6 @@ public class FirebaseManager : MonoBehaviour
         StartCoroutine(Login(emailLoginField.text, passwordLoginField.text));
     }
 
-    //login
 
     IEnumerator Login(string _email, string _password)
     {
@@ -214,7 +237,6 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    //registration
 
     IEnumerator Register(string _email, string _password, string _username)
     {
@@ -329,13 +351,14 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    // loading data
 
     public void Load()
     {
         StartCoroutine(GetCampaignKeys());
         StartCoroutine(GetInviteKeys());
     }
+
+    //Campaign stuff
 
     IEnumerator GetCampaignKeys()
     {
@@ -357,16 +380,12 @@ public class FirebaseManager : MonoBehaviour
 
             Debug.Log("User campaigns:" + snapshot.Child("campaigns").ChildrenCount.ToString());
 
-            playerData.campaignKeys.Clear(); //Clearing campaigns from the array so that they can be readded in order when refreshing
-            playerData.campaignTitles.Clear();
-            playerData.campaignGenres.Clear();
-            playerData.campaignGmNames.Clear();
-            playerData.campaignGmIds.Clear();
+            playerData.campaigns.Clear();
 
             foreach (var child in snapshot.Child("campaigns").Children)
             {
-                playerData.campaignKeys.Add(child.Value.ToString());
                 StartCoroutine(GetCampaignData(child.Value.ToString()));
+                StartCoroutine(GetCharacterKeys(child.Value.ToString()));
             }
 
             yield return new WaitForSeconds(1f);
@@ -393,35 +412,48 @@ public class FirebaseManager : MonoBehaviour
             //data retrieved
             DataSnapshot snapshot = DBTask.Result;
 
+            Campaign campaign = new Campaign();
+            campaign.key = key;
+
+            List<string> playerIDs = new List<string>();
+            List<string> playerNames = new List<string>();
+
             foreach (var child in snapshot.Children)
             {
                 switch (child.Key)
                 {
                     case "title":
-                        playerData.campaignTitles.Add(child.Value.ToString());
+                        campaign.name = child.Value.ToString();
                         break;
                     case "genre":
-                        playerData.campaignGenres.Add(child.Value.ToString());
+                        campaign.genre = child.Value.ToString();
                         break;
                     case "gamemaster":
-                        playerData.campaignGmNames.Add(child.Value.ToString());
+                        campaign.gameMaster = child.Value.ToString();
+                        break;
+                    case "gmid":
+                        campaign.gmID = child.Value.ToString();
                         break;
                     case "players":
-                        playerData.campaignGmIds.Add(child.Child("GM").Value.ToString());
+                        foreach (var pChild in child.Children)
+                        {
+                            playerIDs.Add(pChild.Key.ToString());
+                            playerNames.Add(pChild.Value.ToString());
+                        }
                         break;
                     default:
                         Debug.Log("No save location for " + child.Key);
                         break;
                 }
-
             }
 
-            Debug.Log("All campaign data loaded");
+            campaign.playerIDs = playerIDs;
+            campaign.playerNames = playerNames;
+
+            playerData.campaigns.Add(campaign);
 
         }
     }
-
-    //Campaign stuff
 
     public void CreateCampaign(string name, string genre)
     {
@@ -439,7 +471,7 @@ public class FirebaseManager : MonoBehaviour
         db.Child("campaigns").Child(key).Child("title").SetValueAsync(name);
         db.Child("campaigns").Child(key).Child("genre").SetValueAsync(genre);
         db.Child("campaigns").Child(key).Child("gamemaster").SetValueAsync(gameMaster);
-        db.Child("campaigns").Child(key).Child("players").Child("GM").SetValueAsync(User.UserId);
+        db.Child("campaigns").Child(key).Child("gmid").SetValueAsync(User.UserId);
 
         yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
 
@@ -471,13 +503,12 @@ public class FirebaseManager : MonoBehaviour
         }
         else
         {
-            foreach (string cKey in playerData.campaignKeys)
+            foreach (Campaign c in playerData.campaigns)
             {
-                if (cKey == key)
+                if (c.key == key)
                 {
-                    Debug.Log("For loop is triggering properly: " + cKey);
-                    //db.Child("users").Child(User.UserId).Child("campaigns").Child(cKey).RemoveValueAsync();
-                    StartCoroutine(DeleteCampaignEntry(cKey));
+                    Debug.Log("For loop is triggering properly: " + c.key);
+                    StartCoroutine(DeleteCampaignEntry(c.key));
                     Load();
 
                     //campaigns.Refresh();
@@ -515,6 +546,7 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
+    //Invite Stuff
     public void Invite(string email)
     {
         StartCoroutine(InvitePlayer(email));
@@ -539,7 +571,6 @@ public class FirebaseManager : MonoBehaviour
 
             bool playerFound = false;
             bool messageSent = false;
-            ActiveCampaign activeCampaign = GameObject.Find("Gameplay").GetComponent<ActiveCampaign>();
 
             foreach (var child in snapshot.Children)
             {
@@ -642,11 +673,14 @@ public class FirebaseManager : MonoBehaviour
     {
         StartCoroutine(AcceptInvite(key, eKey));
     }
+
     IEnumerator AcceptInvite(string key, string eKey)
     {
         string userKey = db.Child("users").Child(User.UserId).Child("campaigns").Push().Key;
-
         var DBTask = db.Child("users").Child(User.UserId).Child("campaigns").Child(userKey).SetValueAsync(key);
+
+        string pKey = db.Child("campaigns").Child(key).Child("players").Push().Key;
+        db.Child("campaigns").Child(key).Child("players").Child(User.UserId).SetValueAsync(User.DisplayName);
 
         yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
 
@@ -700,26 +734,88 @@ public class FirebaseManager : MonoBehaviour
             invites.Refresh();
         }
     }
-    void HandleValueChanged(object sender, ValueChangedEventArgs args)
+
+    //Character Stuff
+    public void LoadCharacters(string key)
     {
-        if (args.DatabaseError != null)
-        {
-            Debug.LogError(args.DatabaseError.Message);
-            return;
-        }
-
-        Debug.Log("data had changed");
-
-        // DataSnapshot snapshot = args.Snapshot;
-
-        try
-        {
-            Load();
-        }
-        catch
-        {
-            Debug.Log("Don't like that");
-        }
+        GetCharacterKeys(key);
     }
 
+    IEnumerator GetCharacterKeys(string key)
+    {
+        Debug.Log("Load Characters is being called");
+        var DBTask = db.Child("campaigns").Child(key).Child("characters").GetValueAsync();
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else if (DBTask.Result.Value == null)
+        {
+            Debug.Log("NO Characters could be found");
+        }
+        else
+        {
+            //data retrieved
+            DataSnapshot snapshot = DBTask.Result;
+
+            foreach (var child in snapshot.Children)
+            {
+                //activeCampaign.playerKeys.Add(child.Value.ToString());
+
+                Character c = new Character();
+
+                c.id = child.Value.ToString();
+                c.campaign = key;
+
+                foreach (var cChild in child.Children)
+                {
+                    switch (cChild.Key)
+                    {
+                        case "name":
+
+                            break;
+                        case "word":
+
+                            break;
+                        case "wit":
+
+                            break;
+                        case "will":
+
+                            break;
+                        case "want":
+
+                            break;
+                        case "weapon":
+
+                            break;
+                        case "clothing":
+
+                            break;
+                        case "relic":
+
+                            break;
+                        case "background":
+
+                            break;
+                        case "features":
+
+                            break;
+                        default:
+                            Debug.Log("No save point for " + cChild.Key.ToString());
+                            break;
+                    }
+                }
+
+                playerData.characters.Add(c);
+
+
+            }
+
+            Debug.Log("All Characters Loaded");
+
+        }
+    }
 }

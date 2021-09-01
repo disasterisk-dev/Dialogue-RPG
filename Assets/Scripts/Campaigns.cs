@@ -48,31 +48,32 @@ public class Campaigns : MonoBehaviour
             }
         }
 
-        if (playerData.campaignKeys.Count == 0)
+        if (playerData.campaigns.Count == 0)
         {
             Instantiate(NewCampaign, zones[0].transform);
         }
         else
         {
-            for (int i = 0; i < playerData.campaignKeys.Count; i++)
+            for (int i = 0; i < playerData.campaigns.Count; i++)
             {
                 GameObject card = Instantiate(CampaignCard, zones[i].transform);
                 CampaignCard campaign = card.GetComponent<CampaignCard>();
 
-                campaign.key = playerData.campaignKeys[i];
-                campaign.campaignName = playerData.campaignTitles[i];
-                campaign.genre = playerData.campaignGenres[i];
-                campaign.gmName = playerData.campaignGmNames[i];
-                campaign.gmId = playerData.campaignGmIds[i];
+                campaign.key = playerData.campaigns[i].key;
+                campaign.campaignName = playerData.campaigns[i].name;
+                campaign.genre = playerData.campaigns[i].genre;
+                campaign.gmName = playerData.campaigns[i].gameMaster;
+                campaign.gmId = playerData.campaigns[i].gmID;
+                campaign.playerNames = playerData.campaigns[i].playerNames;
 
                 campaign.SetData();
             }
 
             Debug.Log("Campaign cards loaded");
 
-            if (playerData.campaignKeys.Count < 4)
+            if (playerData.campaigns.Count < 4)
             {
-                Instantiate(NewCampaign, zones[playerData.campaignKeys.Count].transform);
+                Instantiate(NewCampaign, zones[playerData.campaigns.Count].transform);
             }
         }
 

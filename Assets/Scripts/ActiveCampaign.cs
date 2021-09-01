@@ -14,9 +14,14 @@ public class ActiveCampaign : MonoBehaviour
     public string key;
     public string genre;
     public bool gm;
+    public List<string> playerKeys;
+    public List<bool> characterSetup;
+
+    public Character [] characters;
 
     [Header("UI Elements")]
     public TMP_Text title;
+    public GameObject [] zones;
 
 
     [Header("Settings UI Elements")]
@@ -29,6 +34,7 @@ public class ActiveCampaign : MonoBehaviour
     void OnEnable()
     {
         playerData = GameObject.Find("PlayerDataManager").GetComponent<PlayerData>();
+        firebaseManager = GameObject.Find("FirebaseManager").GetComponent<FirebaseManager>();
         campaignName = playerData.campaignName;
         key = playerData.key;
         genre = playerData.genre;
@@ -39,7 +45,7 @@ public class ActiveCampaign : MonoBehaviour
         playerSettings.SetActive(false);
         invite.SetActive(false);
         inviteInfo.gameObject.SetActive(false);
-
+        //firebaseManager.LoadCharacters(key);
     }
 
     void Awake()

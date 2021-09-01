@@ -19,7 +19,7 @@ public class CampaignCard : MonoBehaviour
     public string gmName;
     public string gmId;
     public string genre;
-    public string[] playerNames;
+    public List<string> playerNames;
     void Start()
     {
 
@@ -37,9 +37,12 @@ public class CampaignCard : MonoBehaviour
         {
             title.text = campaignName;
             gameMaster.text = gmName + "'s";
-            players.text = playerNames[1];
-
-            //text.SetActive(true);
+            players.text = "PLAYERS:\n\n";
+            
+            foreach(string name in playerNames)
+            {
+                players.text += name + "\n";
+            }
         }
         catch
         {

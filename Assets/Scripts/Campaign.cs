@@ -6,22 +6,24 @@ using UnityEngine;
 public class Campaign
 {
     public string name;
-    public string id;
+    public string key;
     public string genre;
     public string gameMaster;
-    
-    public List<string> players;
+    public string gmID;
+    public List<string> playerIDs;
+    public List<string> playerNames;
 
     public Campaign()
     {
 
     }
 
-    public Campaign(string name, string id, string genre, string gameMaster)
+    public Campaign(string name, string key, string genre, string gameMaster)
     {
         this.name = name;
-        this.id = id;
+        this.key = key;
         this.genre = genre;
         this.gameMaster = gameMaster;
     }
+    
 }

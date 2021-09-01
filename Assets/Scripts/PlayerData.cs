@@ -16,14 +16,14 @@ public class PlayerData : MonoBehaviour
     public string key;
     public string genre;
     public bool gm;
+    public List<string> players;
 
     [Header("Campaigns")]
-    public List<string> campaignKeys;
-    public List<string> campaignTitles;
-    public List<string> campaignGmNames;
-    public List<string> campaignGmIds;
-    public List<string> campaignGenres;
+
+    public List<Campaign> campaigns;
     //public bool gameMaster;
+
+    public List<Character> characters;
 
     [Header("Invites")]
     public List<string> inviteEntryKeys;
