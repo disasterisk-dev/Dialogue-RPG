@@ -30,6 +30,7 @@ public class LoadCampaign : MonoBehaviour
         playerData.key = this.GetComponent<CampaignCard>().key;
         playerData.genre = this.GetComponent<CampaignCard>().genre;
         playerData.gm = this.GetComponent<CampaignCard>().gmId == playerData.UID ? true : false;
+        playerData.players = this.GetComponent<CampaignCard>().playerIDs;
 
         uIManager = GameObject.Find("UIManager").GetComponent<UIManager>();
         uIManager.LoadScreen(5);

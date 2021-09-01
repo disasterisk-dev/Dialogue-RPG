@@ -65,6 +65,7 @@ public class Campaigns : MonoBehaviour
                 campaign.gmName = playerData.campaigns[i].gameMaster;
                 campaign.gmId = playerData.campaigns[i].gmID;
                 campaign.playerNames = playerData.campaigns[i].playerNames;
+                campaign.playerIDs = playerData.campaigns[i].playerIDs;
 
                 campaign.SetData();
             }

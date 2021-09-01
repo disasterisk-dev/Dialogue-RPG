@@ -20,6 +20,7 @@ public class CampaignCard : MonoBehaviour
     public string gmId;
     public string genre;
     public List<string> playerNames;
+    public List<string> playerIDs;
     void Start()
     {
 
