@@ -6,23 +6,16 @@ using TMPro;
 public class UIManager : MonoBehaviour
 {
     public static UIManager instance;
+    public static UIManager Instance { get { return instance; } }
 
     //Screen object variables
-    public GameObject [] screens;
+    public GameObject[] screens;
 
     Campaigns campaigns;
 
     private void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else if (instance != null)
-        {
-            Debug.Log("Instance already exists, destroying object!");
-            Destroy(this);
-        }
+        instance = this;
 
         //campaigns = GameObject.Find("Campaigns").GetComponent<Campaigns>();
 
@@ -33,7 +26,7 @@ public class UIManager : MonoBehaviour
 
     public void ClearScreen() //Turn off all screens
     {
-        foreach(GameObject obj in screens)
+        foreach (GameObject obj in screens)
         {
             obj.SetActive(false);
         }

@@ -4,8 +4,6 @@ using UnityEngine;
 using TMPro;
 public class Invitation : MonoBehaviour
 {
-    FirebaseManager firebaseManager;
-    PlayerData playerData;
     public TMP_Text gameMasterText;
     public TMP_Text titleText;
 
@@ -28,19 +26,15 @@ public class Invitation : MonoBehaviour
 
     public void Accept()
     {
-        firebaseManager = GameObject.Find("FirebaseManager").GetComponent<FirebaseManager>();
 
-        firebaseManager.Accept(key, entryKey);
+        FirebaseManager.Instance.Accept(key, entryKey);
 
         Destroy(gameObject);
     }
 
     public void Decline()
     {
-        firebaseManager = GameObject.Find("FirebaseManager").GetComponent<FirebaseManager>();
-        playerData = GameObject.Find("PlayerDataManager").GetComponent<PlayerData>();
-
-        firebaseManager.Decline(entryKey);
+        FirebaseManager.Instance.Decline(entryKey);
         Destroy(gameObject);
     }
 }

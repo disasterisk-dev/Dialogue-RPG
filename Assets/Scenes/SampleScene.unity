@@ -1297,6 +1297,8 @@ GameObject:
   m_Component:
   - component: {fileID: 163188771}
   - component: {fileID: 163188772}
+  - component: {fileID: 163188773}
+  - component: {fileID: 163188774}
   m_Layer: 0
   m_Name: FirebaseManager
   m_TagString: Untagged
@@ -1311,12 +1313,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 163188770}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_Father: {fileID: 1646520138}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &163188772
 MonoBehaviour:
@@ -1325,12 +1327,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 163188770}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9e67a7a65ffce244b8598d352866c621, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   dependencyStatus: 0
+  root: https://dialogue-rpg-default-rtdb.europe-west1.firebasedatabase.app/
   emailLoginField: {fileID: 477848335}
   passwordLoginField: {fileID: 1964179401}
   warningLoginText: {fileID: 388622558}
@@ -1347,6 +1350,51 @@ MonoBehaviour:
   campaigns: {fileID: 338147453}
   invites: {fileID: 1328111599}
   activeCampaign: {fileID: 2037213257}
+--- !u!114 &163188773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 163188770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc3292b541cdb514aa3620e8d3c2e63a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uri: https://dialogue-rpg-default-rtdb.europe-west1.firebasedatabase.app/
+  authKey: AIzaSyDCYqnjRPNwMkgKckBsfFOSIMCiXfnKG34
+  idToken: 
+  localId: 
+  user:
+    username: 
+    email: 
+    localId: 
+    campaigns: []
+    invites: []
+  emailLoginField: {fileID: 477848335}
+  passwordLoginField: {fileID: 1964179401}
+  warningLoginText: {fileID: 388622558}
+  confirmLoginText: {fileID: 696364118}
+  loginButton: {fileID: 873047314}
+  registerButton: {fileID: 1972649435}
+  usernameRegisterField: {fileID: 938379337}
+  emailRegisterField: {fileID: 462899650}
+  passwordRegisterField: {fileID: 324407507}
+  passwordRegisterVerifyField: {fileID: 1637897172}
+  warningRegisterText: {fileID: 1842697746}
+--- !u!114 &163188774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 163188770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 538a572dd6379694f8895d226bf76976, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &168689544
 GameObject:
   m_ObjectHideFlags: 0
@@ -2298,7 +2346,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 824f051bd3d3e4f4e8fc831b0ba78de1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerData: {fileID: 0}
+  title: {fileID: 13896126}
   zones:
   - {fileID: 299543702}
   - {fileID: 900088226}
@@ -3902,7 +3950,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &525227346
 GameObject:
@@ -4593,18 +4641,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78aa732c7565be44f91696966652b83e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  username: 
-  email: 
-  UID: 
+  user:
+    username: 
+    email: 
+    localId: 
+    campaigns: []
+    invites: []
   campaignName: 
   key: 
   genre: 
   gm: 0
-  campaignKeys: []
-  campaignTitles: []
-  campaignGmNames: []
-  campaignGmIds: []
-  campaignGenres: []
+  players: []
+  campaigns: []
   characters: []
   inviteEntryKeys: []
   inviteKeys: []
@@ -4620,12 +4668,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 624360562}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 945.7719, y: 467.90427, z: -465.75}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_Father: {fileID: 1646520138}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &649393242
 GameObject:
@@ -5396,7 +5444,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &786454417
 GameObject:
@@ -6083,7 +6131,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 872472412}
-  - component: {fileID: 872472413}
   m_Layer: 5
   m_Name: Campaign Details
   m_TagString: Untagged
@@ -6113,28 +6160,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &872472413
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 872472411}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 824f051bd3d3e4f4e8fc831b0ba78de1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerData: {fileID: 624360563}
-  zones:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  NewCampaign: {fileID: 70858813258017245, guid: d254c9cf0fb0f57498cb179f8a9235a8,
-    type: 3}
-  CampaignCard: {fileID: 2816751721744149322, guid: 077e0c1d45d86ac47b2ead61daf4533d,
-    type: 3}
 --- !u!1 &873047312
 GameObject:
   m_ObjectHideFlags: 0
@@ -6217,7 +6242,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 163188772}
+      - m_Target: {fileID: 163188773}
         m_MethodName: LoginButton
         m_Mode: 1
         m_Arguments:
@@ -6724,7 +6749,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 163188772}
+      - m_Target: {fileID: 163188773}
         m_MethodName: SignOutButton
         m_Mode: 1
         m_Arguments:
@@ -9453,7 +9478,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8635832a074a84348aacd278155d5e2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerData: {fileID: 0}
   zones:
   - {fileID: 406562464}
   - {fileID: 306816573}
@@ -10621,7 +10645,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 163188772}
+      - m_Target: {fileID: 163188773}
         m_MethodName: RegisterButton
         m_Mode: 1
         m_Arguments:
@@ -11764,6 +11788,39 @@ RectTransform:
   m_AnchoredPosition: {x: 720, y: 0}
   m_SizeDelta: {x: 700, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1646520137
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1646520138}
+  m_Layer: 0
+  m_Name: Managers
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1646520138
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1646520137}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 624360564}
+  - {fileID: 163188771}
+  - {fileID: 2019271848}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1664868315
 GameObject:
   m_ObjectHideFlags: 0
@@ -11906,7 +11963,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1665779164}
-  - component: {fileID: 1665779165}
   m_Layer: 5
   m_Name: Genres
   m_TagString: Untagged
@@ -11936,28 +11992,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1665779165
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1665779163}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 824f051bd3d3e4f4e8fc831b0ba78de1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerData: {fileID: 0}
-  zones:
-  - {fileID: 180202907}
-  - {fileID: 1893055227}
-  - {fileID: 543203096}
-  - {fileID: 925237573}
-  NewCampaign: {fileID: 70858813258017245, guid: d254c9cf0fb0f57498cb179f8a9235a8,
-    type: 3}
-  CampaignCard: {fileID: 2816751721744149322, guid: 077e0c1d45d86ac47b2ead61daf4533d,
-    type: 3}
 --- !u!1 &1678503779
 GameObject:
   m_ObjectHideFlags: 0
@@ -12647,7 +12681,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 163188772}
+      - m_Target: {fileID: 163188773}
         m_MethodName: SignOutButton
         m_Mode: 1
         m_Arguments:
@@ -12741,7 +12775,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190335
+    rgba: 4294967295
   m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -13901,7 +13935,7 @@ MonoBehaviour:
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 1
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -13915,8 +13949,8 @@ Canvas:
   m_GameObject: {fileID: 1950960396}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_RenderMode: 1
+  m_Camera: {fileID: 519420031}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -13940,7 +13974,7 @@ RectTransform:
   m_Children:
   - {fileID: 1930803208}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -14368,12 +14402,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2019271846}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_Father: {fileID: 1646520138}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2037213255
 GameObject:

@@ -4,9 +4,6 @@ using UnityEngine;
 
 public class LoadCampaign : MonoBehaviour
 {
-    PlayerData playerData;
-    FirebaseManager firebaseManager;
-    UIManager uIManager;
     // Start is called before the first frame update
     void Start()
     {
@@ -21,18 +18,15 @@ public class LoadCampaign : MonoBehaviour
 
     public void Load()
     {
-        playerData = GameObject.Find("PlayerDataManager").GetComponent<PlayerData>();
-        firebaseManager = GameObject.Find("FirebaseManager").GetComponent<FirebaseManager>();
 
         //firebaseManager.LoadCharacters(this.GetComponent<CampaignCard>().key);
+ 
+        PlayerData.Instance.campaignName = this.GetComponent<CampaignCard>().campaignName;
+        PlayerData.Instance.key = this.GetComponent<CampaignCard>().key;
+        PlayerData.Instance.genre = this.GetComponent<CampaignCard>().genre;
+        PlayerData.Instance.gm = this.GetComponent<CampaignCard>().gmId == PlayerData.Instance.user.localId ? true : false;
+        PlayerData.Instance.players = this.GetComponent<CampaignCard>().playerIDs;
 
-        playerData.campaignName = this.GetComponent<CampaignCard>().campaignName;
-        playerData.key = this.GetComponent<CampaignCard>().key;
-        playerData.genre = this.GetComponent<CampaignCard>().genre;
-        playerData.gm = this.GetComponent<CampaignCard>().gmId == playerData.UID ? true : false;
-        playerData.players = this.GetComponent<CampaignCard>().playerIDs;
-
-        uIManager = GameObject.Find("UIManager").GetComponent<UIManager>();
-        uIManager.LoadScreen(5);
+        UIManager.Instance.LoadScreen(5);
     }
 }

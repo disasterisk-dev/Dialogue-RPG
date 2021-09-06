@@ -6,14 +6,21 @@ using Firebase.Database;
 using Firebase.Auth;
 using UnityEngine.UI;
 using TMPro;
+using Proyecto26;
+using UnityEngine.Networking;
 
 public class FirebaseManager : MonoBehaviour
 {
+    public static FirebaseManager instance;
+    public static FirebaseManager Instance { get { return instance; } }
+
     [Header("Firebase")]
     public DependencyStatus dependencyStatus;
     public FirebaseAuth auth;
     public FirebaseUser User;
     public DatabaseReference db;
+
+    public string root = "https://dialogue-rpg-default-rtdb.europe-west1.firebasedatabase.app/";
 
     [Header("Login")]
     public TMP_InputField emailLoginField;
@@ -41,34 +48,25 @@ public class FirebaseManager : MonoBehaviour
 
     void Awake()
     {
-        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
-        {
-            dependencyStatus = task.Result;
-            if (dependencyStatus == DependencyStatus.Available)
-            {
-                InitializeFirebase();
-            }
-            else
-            {
-                Debug.Log("Could not resolve Firebase Dependencies: " + dependencyStatus);
-            }
-        });
+        instance = this;
 
-        //playerData = GameObject.Find("PlayerDataManager").GetComponent<PlayerData>();
 
     }
 
     void Start()
     {
-        if (PlayerPrefs.HasKey("UserEmail") && PlayerPrefs.HasKey("UserPassword"))
-        {
-            Debug.Log("auto login");
-            StartCoroutine(AutoLogin());
-        }
-        else
-        {
-            Debug.Log("No Login Data Saved");
-        }
+
+        // if (PlayerPrefs.HasKey("UserEmail") && PlayerPrefs.HasKey("UserPassword"))
+        // {
+        //     Debug.Log("auto login");
+        //     StartCoroutine(AutoLogin());
+
+
+        // }
+        // else
+        // {
+        //     Debug.Log("No Login Data Saved");
+        // }
     }
 
     public void InitializeFirebase()
@@ -100,7 +98,7 @@ public class FirebaseManager : MonoBehaviour
         {
             try
             {
-                Load();
+                //Load();
             }
             catch
             {
@@ -125,18 +123,6 @@ public class FirebaseManager : MonoBehaviour
         passwordRegisterVerifyField.text = "";
     }
 
-    //Functions allowing access via button
-
-    public void LoginButton()
-    {
-        StartCoroutine(Login(emailLoginField.text, passwordLoginField.text));
-    }
-
-    public void RegisterButton()
-    {
-        StartCoroutine(Register(emailRegisterField.text, passwordRegisterField.text, usernameRegisterField.text));
-    }
-
     public void SignOutButton()
     {
         auth.SignOut();
@@ -150,400 +136,6 @@ public class FirebaseManager : MonoBehaviour
 
         PlayerPrefs.DeleteKey("UserEmail");
         PlayerPrefs.DeleteKey("UserPassword");
-    }
-
-    public void SaveDataButton()
-    {
-        StartCoroutine(UpdateUsernameAuth(usernameField.text));
-        StartCoroutine(UpdateUsernameDatabase(usernameField.text));
-    }
-
-    IEnumerator AutoLogin()
-    {
-        emailLoginField.text = PlayerPrefs.GetString("UserEmail");
-        passwordLoginField.text = PlayerPrefs.GetString("UserPassword");
-
-        loginButton.gameObject.SetActive(false);
-        registerButton.gameObject.SetActive(false);
-        warningLoginText.gameObject.SetActive(true);
-
-        yield return new WaitForSeconds(0.5f);
-
-        StartCoroutine(Login(emailLoginField.text, passwordLoginField.text));
-    }
-
-
-    IEnumerator Login(string _email, string _password)
-    {
-        var LoginTask = auth.SignInWithEmailAndPasswordAsync(_email, _password);
-        //wait until the above is done
-        yield return new WaitUntil(predicate: () => LoginTask.IsCompleted);
-
-        if (LoginTask.Exception != null)
-        {
-            //handle ay errors
-            Debug.LogWarning(message: $"Failed to register task with {LoginTask.Exception}");
-            FirebaseException firebaseEx = LoginTask.Exception.GetBaseException() as FirebaseException;
-            AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
-
-            //display appropriate error message
-            string message = "Login Failed!";
-            switch (errorCode)
-            {
-                case AuthError.MissingEmail:
-                    message = "Missing Email";
-                    break;
-                case AuthError.MissingPassword:
-                    message = "Missing Password";
-                    break;
-                case AuthError.WrongPassword:
-                    message = "Incorrect Password";
-                    break;
-                case AuthError.InvalidEmail:
-                    message = "Email is Invalid";
-                    break;
-                case AuthError.UserNotFound:
-                    message = "Account does not exist";
-                    break;
-            }
-
-            warningLoginText.text = message;
-        }
-        else
-        {
-            //using is now logged in
-            User = LoginTask.Result;
-            Debug.LogFormat("User signed in successfully: {0} ({1})", User.DisplayName, User.Email);
-            warningLoginText.text = "";
-            confirmLoginText.text = "Logged in";
-            Load();
-
-            yield return new WaitForSeconds(1.5f);
-
-            usernameField.text = User.DisplayName + "'s Campaigns";
-            UIManager.instance.LoadScreen(2);
-            confirmLoginText.text = "";
-            ClearLoginFields();
-            ClearRegisterFields();
-
-            PlayerPrefs.SetString("UserEmail", _email);
-            PlayerPrefs.SetString("UserPassword", _password);
-
-            playerData.email = _email;
-            playerData.username = User.DisplayName;
-            playerData.UID = User.UserId;
-
-
-        }
-    }
-
-
-    IEnumerator Register(string _email, string _password, string _username)
-    {
-        if (_username == "")
-        {
-            warningRegisterText.text = "Missing Username";
-        }
-        else if (passwordRegisterField.text != passwordRegisterVerifyField.text)
-        {
-            warningRegisterText.text = "Passwords do not match";
-        }
-        else
-        {
-            var RegisterTask = auth.CreateUserWithEmailAndPasswordAsync(_email, _password);
-            //wait until above is done
-            yield return new WaitUntil(predicate: () => RegisterTask.IsCompleted);
-
-            if (RegisterTask.Exception != null)
-            {
-                Debug.LogWarning(message: $"Failed to register task with {RegisterTask.Exception}");
-                FirebaseException firebaseEx = RegisterTask.Exception.GetBaseException() as FirebaseException;
-                AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
-
-                string message = "Register Failed!";
-                switch (errorCode)
-                {
-                    case AuthError.MissingEmail:
-                        message = "Missing Email";
-                        break;
-                    case AuthError.MissingPassword:
-                        message = "Missing Password";
-                        break;
-                    case AuthError.WeakPassword:
-                        message = "Password too weak";
-                        break;
-                    case AuthError.EmailAlreadyInUse:
-                        message = "Email already in use";
-                        break;
-                }
-
-                warningRegisterText.text = message;
-            }
-            else
-            {
-                //new user created
-                User = RegisterTask.Result;
-
-                if (User != null)
-                {
-                    //create profile and add display name
-                    UserProfile profile = new UserProfile { DisplayName = _username };
-
-                    var ProfileTask = User.UpdateUserProfileAsync(profile);
-                    //wait until above is done
-                    yield return new WaitUntil(predicate: () => ProfileTask.IsCompleted);
-
-                    if (ProfileTask.Exception != null)
-                    {
-                        //handle errors
-                        Debug.LogWarning(message: $"Failed to Register task with {ProfileTask.Exception}");
-                        FirebaseException firebaseEx = ProfileTask.Exception.GetBaseException() as FirebaseException;
-                        AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
-                        warningRegisterText.text = "Username Set Failed!";
-                    }
-                    else
-                    {
-                        db.Child("users").Child(User.UserId).Child("username").SetValueAsync(_username);
-                        db.Child("users").Child(User.UserId).Child("email").SetValueAsync(_email);
-                        //username is set
-                        UIManager.instance.LoadScreen(2);
-                        warningRegisterText.text = "";
-                        ClearLoginFields();
-                        ClearRegisterFields();
-
-                        PlayerPrefs.SetString("UserEmail", _email);
-                        PlayerPrefs.SetString("UserPassword", _password);
-                    }
-                }
-            }
-        }
-    }
-
-    IEnumerator UpdateUsernameAuth(string _username)
-    {
-        UserProfile profile = new UserProfile { DisplayName = _username };
-
-        var ProfileTask = User.UpdateUserProfileAsync(profile);
-        yield return new WaitUntil(predicate: () => ProfileTask.IsCompleted);
-
-        if (ProfileTask.Exception != null)
-        {
-            Debug.LogWarning(message: $"Failed to register task with {ProfileTask.Exception}");
-        }
-        else
-        {
-            //username updated
-        }
-    }
-
-    IEnumerator UpdateUsernameDatabase(string _username)
-    {
-        var DBTask = db.Child("users").Child(User.UserId).Child("username").SetValueAsync(_username);
-        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
-
-        if (DBTask.Exception != null)
-        {
-            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
-        }
-        else
-        {
-            //username updated in database
-        }
-    }
-
-
-    public void Load()
-    {
-        StartCoroutine(GetCampaignKeys());
-        StartCoroutine(GetInviteKeys());
-    }
-
-    //Campaign stuff
-
-    IEnumerator GetCampaignKeys()
-    {
-        var DBTask = db.Child("users").Child(User.UserId).GetValueAsync();
-        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
-
-        if (DBTask.Exception != null)
-        {
-            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
-        }
-        else if (DBTask.Result.Value == null)
-        {
-            Debug.Log("This user has no data");
-        }
-        else
-        {
-            //data retrieved
-            DataSnapshot snapshot = DBTask.Result;
-
-            Debug.Log("User campaigns:" + snapshot.Child("campaigns").ChildrenCount.ToString());
-
-            playerData.campaigns.Clear();
-
-            foreach (var child in snapshot.Child("campaigns").Children)
-            {
-                StartCoroutine(GetCampaignData(child.Value.ToString()));
-                StartCoroutine(GetCharacterKeys(child.Value.ToString()));
-            }
-
-            yield return new WaitForSeconds(1f);
-
-            campaigns.Refresh();
-        }
-    }
-
-    IEnumerator GetCampaignData(string key)
-    {
-        var DBTask = db.Child("campaigns").Child(key).GetValueAsync();
-        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
-
-        if (DBTask.Exception != null)
-        {
-            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
-        }
-        else if (DBTask.Result.Value == null)
-        {
-            Debug.Log("This user has no data");
-        }
-        else
-        {
-            //data retrieved
-            DataSnapshot snapshot = DBTask.Result;
-
-            Campaign campaign = new Campaign();
-            campaign.key = key;
-
-            List<string> playerIDs = new List<string>();
-            List<string> playerNames = new List<string>();
-
-            foreach (var child in snapshot.Children)
-            {
-                switch (child.Key)
-                {
-                    case "title":
-                        campaign.name = child.Value.ToString();
-                        break;
-                    case "genre":
-                        campaign.genre = child.Value.ToString();
-                        break;
-                    case "gamemaster":
-                        campaign.gameMaster = child.Value.ToString();
-                        break;
-                    case "gmid":
-                        campaign.gmID = child.Value.ToString();
-                        break;
-                    case "players":
-                        foreach (var pChild in child.Children)
-                        {
-                            playerIDs.Add(pChild.Key.ToString());
-                            playerNames.Add(pChild.Value.ToString());
-                        }
-                        break;
-                    default:
-                        Debug.Log("No save location for " + child.Key);
-                        break;
-                }
-            }
-
-            campaign.playerIDs = playerIDs;
-            campaign.playerNames = playerNames;
-
-            playerData.campaigns.Add(campaign);
-
-        }
-    }
-
-    public void CreateCampaign(string name, string genre)
-    {
-        StartCoroutine(NewCampaign(name, genre, User.DisplayName));
-    }
-
-    IEnumerator NewCampaign(string name, string genre, string gameMaster)
-    {
-        //generate new key in this location as a unique id for this campaign
-        string key = db.Child("campaigns").Push().Key;
-        string userKey = db.Child("users").Child(User.UserId).Child("campaigns").Push().Key;
-
-        var DBTask = db.Child("users").Child(User.UserId).Child("campaigns").Child(userKey).SetValueAsync(key);
-
-        db.Child("campaigns").Child(key).Child("title").SetValueAsync(name);
-        db.Child("campaigns").Child(key).Child("genre").SetValueAsync(genre);
-        db.Child("campaigns").Child(key).Child("gamemaster").SetValueAsync(gameMaster);
-        db.Child("campaigns").Child(key).Child("gmid").SetValueAsync(User.UserId);
-
-        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
-
-        if (DBTask.Exception != null)
-        {
-            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
-        }
-        else
-        {
-            Debug.Log("New Campaign created");
-            campaigns.Refresh();
-        }
-    }
-
-    public void DeleteCampaign(string key)
-    {
-        StartCoroutine(DeleteCampaignIenum(key));
-    }
-
-    IEnumerator DeleteCampaignIenum(string key)
-    {
-        var DBTask = db.Child("campaigns").Child(key).RemoveValueAsync();
-
-        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
-
-        if (DBTask.Exception != null)
-        {
-            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
-        }
-        else
-        {
-            foreach (Campaign c in playerData.campaigns)
-            {
-                if (c.key == key)
-                {
-                    Debug.Log("For loop is triggering properly: " + c.key);
-                    StartCoroutine(DeleteCampaignEntry(c.key));
-                    Load();
-
-                    //campaigns.Refresh();
-                }
-            }
-            Debug.Log("Campaign Deleted");
-            //campaigns.Refresh();
-        }
-    }
-
-    IEnumerator DeleteCampaignEntry(string cKey)
-    {
-        var DBTask = db.Child("users").Child(User.UserId).Child("campaigns").GetValueAsync();
-        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
-
-        if (DBTask.Exception != null)
-        {
-            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
-        }
-        else if (DBTask.Result.Value == null)
-        {
-            Debug.Log("This user has no data");
-        }
-        else
-        {
-            DataSnapshot snapshot = DBTask.Result;
-
-            foreach (var child in snapshot.Children)
-            {
-                if (child.Value.ToString() == cKey)
-                {
-                    db.Child("users").Child(User.UserId).Child("campaigns").Child(child.Key).RemoveValueAsync();
-                }
-            }
-        }
     }
 
     //Invite Stuff

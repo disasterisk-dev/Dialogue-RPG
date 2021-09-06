@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Proyecto26;
+using FullSerializer;
 
 public class ActiveCampaign : MonoBehaviour
 {
-    PlayerData playerData;
-    FirebaseManager firebaseManager;
-    UIManager uIManager;
 
     [Header("Campaign Data")]
     public string campaignName;
@@ -17,11 +16,11 @@ public class ActiveCampaign : MonoBehaviour
     public List<string> playerKeys;
     public List<bool> characterSetup;
 
-    public Character [] characters;
+    public Character[] characters;
 
     [Header("UI Elements")]
     public TMP_Text title;
-    public GameObject [] zones;
+    public GameObject[] zones;
 
 
     [Header("Settings UI Elements")]
@@ -33,12 +32,10 @@ public class ActiveCampaign : MonoBehaviour
 
     void OnEnable()
     {
-        playerData = GameObject.Find("PlayerDataManager").GetComponent<PlayerData>();
-        firebaseManager = GameObject.Find("FirebaseManager").GetComponent<FirebaseManager>();
-        campaignName = playerData.campaignName;
-        key = playerData.key;
-        genre = playerData.genre;
-        gm = playerData.gm;
+        campaignName = PlayerData.Instance.campaignName;
+        key = PlayerData.Instance.key;
+        genre = PlayerData.Instance.genre;
+        gm = PlayerData.Instance.gm;
 
         title.text = campaignName;
         gmSettings.SetActive(false);
@@ -48,7 +45,7 @@ public class ActiveCampaign : MonoBehaviour
         //firebaseManager.LoadCharacters(key);
     }
 
-    void Awake()
+    void Start()
     {
 
     }
@@ -87,11 +84,22 @@ public class ActiveCampaign : MonoBehaviour
 
     public void Delete()
     {
-        firebaseManager = GameObject.Find("FirebaseManager").GetComponent<FirebaseManager>();
-        uIManager = GameObject.Find("UIManager").GetComponent<UIManager>();
-
-        firebaseManager.DeleteCampaign(key);
-        uIManager.LoadScreen(2);
+        RestClient.Delete(AccountManager.Instance.uri + "/campaigns/" + key + ".json?auth=" + AccountManager.Instance.idToken)
+        .Then(response =>
+        {
+            PlayerData.Instance.user.campaigns.Remove(key);
+            RestClient.Put(AccountManager.Instance.uri + "/users/" + AccountManager.Instance.localId + ".json?auth=" + AccountManager.Instance.idToken, PlayerData.Instance.user)
+                    .Catch(error =>
+                    {
+                        Debug.Log(error);
+                    });
+            Debug.Log("Deleted");
+            UIManager.Instance.LoadScreen(2);
+        })
+        .Catch(error =>
+        {
+            Debug.Log("Couldn't Delete campaign: " + error);
+        });
     }
 
     public void ShowInvite()
@@ -105,9 +113,7 @@ public class ActiveCampaign : MonoBehaviour
         if (inviteField.text != "")
         {
             Debug.Log(inviteField.text);
-
-            firebaseManager = GameObject.Find("FirebaseManager").GetComponent<FirebaseManager>();
-            firebaseManager.Invite(inviteField.text);
+            FirebaseManager.Instance.Invite(inviteField.text);
 
             inviteField.text = "";
             invite.SetActive(false);

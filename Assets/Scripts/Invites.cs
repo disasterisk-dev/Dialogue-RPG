@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Invites : MonoBehaviour
 {
-    public PlayerData playerData;
 
     [Header("UICards")]
     public GameObject[] zones;
@@ -31,8 +30,6 @@ public class Invites : MonoBehaviour
     public void Refresh()
     {
 
-        playerData = GameObject.Find("PlayerDataManager").GetComponent<PlayerData>();
-
         foreach (GameObject obj in zones)
         {
             if (obj.transform.childCount > 0)
@@ -44,21 +41,21 @@ public class Invites : MonoBehaviour
             }
         }
 
-        if (playerData.inviteKeys.Count == 0)
+        if (PlayerData.Instance.inviteKeys.Count == 0)
         {
             Debug.Log("No Invites in inbox");
         }
         else
         {
-            for (int i = 0; i < playerData.inviteKeys.Count; i++)
+            for (int i = 0; i < PlayerData.Instance.inviteKeys.Count; i++)
             {
                 GameObject card = Instantiate(InviteCard, zones[i].transform);
                 Invitation invitation = card.GetComponent<Invitation>();
 
-                invitation.entryKey = playerData.inviteEntryKeys[i];
-                invitation.key = playerData.inviteKeys[i];
-                invitation.title = playerData.inviteTitles[i];
-                invitation.gameMaster = playerData.inviteGms[i];
+                invitation.entryKey = PlayerData.Instance.inviteEntryKeys[i];
+                invitation.key = PlayerData.Instance.inviteKeys[i];
+                invitation.title = PlayerData.Instance.inviteTitles[i];
+                invitation.gameMaster = PlayerData.Instance.inviteGms[i];
 
                 invitation.titleText.text = invitation.title;
                 invitation.gameMasterText.text = invitation.gameMaster + " has invited you to join";

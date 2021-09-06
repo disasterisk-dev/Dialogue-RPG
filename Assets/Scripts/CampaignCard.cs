@@ -5,7 +5,6 @@ using TMPro;
 
 public class CampaignCard : MonoBehaviour
 {
-    FirebaseManager fb;
 
     [Header("Elements")]
     public TMP_Text title;
@@ -49,12 +48,5 @@ public class CampaignCard : MonoBehaviour
         {
             Debug.Log("bitch ass exception strikes again");
         }
-    }
-
-    public void Delete()
-    {
-        fb = GameObject.Find("FirebaseManager").GetComponent<FirebaseManager>();
-
-        fb.DeleteCampaign(key);
     }
 }

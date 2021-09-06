@@ -5,11 +5,10 @@ using UnityEngine;
 public class PlayerData : MonoBehaviour
 {
     public static PlayerData instance;
+    public static PlayerData Instance { get { return instance; } }
 
     [Header("Credentials")]
-    public string username;
-    public string email;
-    public string UID;
+    public User user;
 
     [Header("Active Campaign")]
     public string campaignName;
@@ -36,16 +35,20 @@ public class PlayerData : MonoBehaviour
     public string tempGenre;
     public string tempCampaignName;
 
+    private void Awake()
+    {
+        instance = this;
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }
