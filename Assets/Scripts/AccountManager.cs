@@ -99,7 +99,6 @@ public class AccountManager : MonoBehaviour
 
                 Debug.Log("Logging in: " + response2.username);
 
-                Load();
 
                 UIManager.Instance.LoadScreen(2);
 
@@ -115,26 +114,6 @@ public class AccountManager : MonoBehaviour
         .Catch(error =>
         {
             Debug.Log("Could not login user: " + error);
-        });
-    }
-
-    public void Load()
-    {
-
-        RestClient.Get(AccountManager.Instance.uri + "/users/" + PlayerData.Instance.user.localId + "/campaigns.json?auth=" + AccountManager.Instance.idToken)
-        .Then(response =>
-        {
-
-            fsData campaignData = fsJsonParser.Parse(response.Text);
-            Dictionary<string, string> campaignKeys = null;
-            serializer.TryDeserialize(campaignData, ref campaignKeys);
-
-            foreach (var c in campaignKeys.Values)
-            {
-                PlayerData.Instance.user.campaigns.Add(c);
-            }
-
-            GameObject.Find("Campaigns").GetComponent<Campaigns>().Refresh();
         });
     }
 

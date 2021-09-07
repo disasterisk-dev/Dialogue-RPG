@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-public class Invitation : MonoBehaviour
+using Proyecto26;
+using FullSerializer;
+
+public class InvitationCard : MonoBehaviour
 {
     public TMP_Text gameMasterText;
     public TMP_Text titleText;
@@ -10,31 +13,29 @@ public class Invitation : MonoBehaviour
     public string gameMaster;
     public string title;
     public string key;
-    public string entryKey;
+
+    public static fsSerializer serializer = new fsSerializer();
 
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     public void Accept()
     {
-
-        FirebaseManager.Instance.Accept(key, entryKey);
 
         Destroy(gameObject);
     }
 
     public void Decline()
     {
-        FirebaseManager.Instance.Decline(entryKey);
         Destroy(gameObject);
     }
 }

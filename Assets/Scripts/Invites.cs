@@ -1,9 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Proyecto26;
+using FullSerializer;
 
 public class Invites : MonoBehaviour
 {
+    public static fsSerializer serializer = new fsSerializer();
 
     [Header("UICards")]
     public GameObject[] zones;
@@ -11,21 +14,32 @@ public class Invites : MonoBehaviour
     [Header("Prefabs")]
     public GameObject InviteCard;
     // Start is called before the first frame update
-    void Start()
+    void OnEnable()
     {
-        // foreach (GameObject obj in zones)
-        // {
-        //     if (obj.transform.childCount > 0)
-        //     {
-        //         Destroy(obj.transform.GetChild(0).gameObject);
-        //     }
-        // }
-    }
+        PlayerData.Instance.invites.Clear();
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        RestClient.Get(AccountManager.Instance.uri + "/campaigns.json?auth=" + AccountManager.Instance.idToken)
+            .Then(response =>
+            {
+                fsData campaignData = fsJsonParser.Parse(response.Text);
+                Dictionary<string, Campaign> campaigns = null;
+                serializer.TryDeserialize(campaignData, ref campaigns);
+
+                foreach (string k in PlayerData.Instance.user.invites)
+                {
+                    if (campaigns.ContainsKey(k))
+                    {
+                        PlayerData.Instance.invites.Add(new Invite()
+                        {
+                            title = campaigns[k].title,
+                            key = k,
+                            gm = campaigns[k].gamemaster,
+                        });
+                    }
+                }
+
+                Refresh();
+            });
     }
     public void Refresh()
     {
@@ -41,21 +55,20 @@ public class Invites : MonoBehaviour
             }
         }
 
-        if (PlayerData.Instance.inviteKeys.Count == 0)
+        if (PlayerData.Instance.invites.Count == 0)
         {
             Debug.Log("No Invites in inbox");
         }
         else
         {
-            for (int i = 0; i < PlayerData.Instance.inviteKeys.Count; i++)
+            for (int i = 0; i < PlayerData.Instance.invites.Count; i++)
             {
                 GameObject card = Instantiate(InviteCard, zones[i].transform);
-                Invitation invitation = card.GetComponent<Invitation>();
+                InvitationCard invitation = card.GetComponent<InvitationCard>();
 
-                invitation.entryKey = PlayerData.Instance.inviteEntryKeys[i];
-                invitation.key = PlayerData.Instance.inviteKeys[i];
-                invitation.title = PlayerData.Instance.inviteTitles[i];
-                invitation.gameMaster = PlayerData.Instance.inviteGms[i];
+                invitation.key = PlayerData.Instance.invites[i].key;
+                invitation.title = PlayerData.Instance.invites[i].title;
+                invitation.gameMaster = PlayerData.Instance.invites[i].gm;
 
                 invitation.titleText.text = invitation.title;
                 invitation.gameMasterText.text = invitation.gameMaster + " has invited you to join";

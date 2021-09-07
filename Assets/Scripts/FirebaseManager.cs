@@ -203,63 +203,59 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    IEnumerator GetInviteKeys()
-    {
-        var DBTask = db.Child("users").Child(User.UserId).GetValueAsync();
-        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+    // IEnumerator GetInviteKeys()
+    // {
+    //     var DBTask = db.Child("users").Child(User.UserId).GetValueAsync();
+    //     yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
 
-        if (DBTask.Exception != null)
-        {
-            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
-        }
-        else if (DBTask.Result.Value == null)
-        {
-            Debug.Log("This user has no data");
-        }
-        else
-        {
-            //data retrieved
-            DataSnapshot snapshot = DBTask.Result;
+    //     if (DBTask.Exception != null)
+    //     {
+    //         Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+    //     }
+    //     else if (DBTask.Result.Value == null)
+    //     {
+    //         Debug.Log("This user has no data");
+    //     }
+    //     else
+    //     {
+    //         //data retrieved
+    //         DataSnapshot snapshot = DBTask.Result;
 
-            Debug.Log("User Invites:" + snapshot.Child("invites").ChildrenCount.ToString());
+    //         Debug.Log("User Invites:" + snapshot.Child("invites").ChildrenCount.ToString());
 
-            playerData.inviteEntryKeys.Clear();
-            playerData.inviteKeys.Clear(); //Clearing invites from the array so that they can be readded in order when refreshing
-            playerData.inviteTitles.Clear();
-            playerData.inviteGms.Clear();
 
-            foreach (var child in snapshot.Child("invites").Children)
-            {
-                string iKey = child.Key.ToString();
-                playerData.inviteEntryKeys.Add(iKey);
+    //         foreach (var child in snapshot.Child("invites").Children)
+    //         {
+    //             string iKey = child.Key.ToString();
+    //             playerData.inviteEntryKeys.Add(iKey);
 
-                foreach (var iChild in snapshot.Child("invites").Child(iKey).Children)
-                {
-                    switch (iChild.Key)
-                    {
-                        case "key":
-                            playerData.inviteKeys.Add(iChild.Value.ToString());
-                            break;
-                        case "title":
-                            playerData.inviteTitles.Add(iChild.Value.ToString());
-                            break;
-                        case "gamemaster":
-                            playerData.inviteGms.Add(iChild.Value.ToString());
-                            break;
-                        default:
-                            Debug.Log("No save location for " + iChild.Key);
-                            break;
-                    }
-                }
+    //             foreach (var iChild in snapshot.Child("invites").Child(iKey).Children)
+    //             {
+    //                 switch (iChild.Key)
+    //                 {
+    //                     case "key":
+    //                         playerData.inviteKeys.Add(iChild.Value.ToString());
+    //                         break;
+    //                     case "title":
+    //                         playerData.inviteTitles.Add(iChild.Value.ToString());
+    //                         break;
+    //                     case "gamemaster":
+    //                         playerData.inviteGms.Add(iChild.Value.ToString());
+    //                         break;
+    //                     default:
+    //                         Debug.Log("No save location for " + iChild.Key);
+    //                         break;
+    //                 }
+    //             }
 
-                Debug.Log("All invite data loaded");
-            }
+    //             Debug.Log("All invite data loaded");
+    //         }
 
-            yield return new WaitForSeconds(1f);
+    //         yield return new WaitForSeconds(1f);
 
-            invites.Refresh();
-        }
-    }
+    //         invites.Refresh();
+    //     }
+    // }
 
     public void Accept(string key, string eKey)
     {
@@ -283,49 +279,49 @@ public class FirebaseManager : MonoBehaviour
         else
         {
             Debug.Log("Joined Campaign");
-            StartCoroutine(DeleteInvite(eKey));
+            //StartCoroutine(DeleteInvite(eKey));
         }
     }
 
-    public void Decline(string eKey)
-    {
-        StartCoroutine(DeleteInvite(eKey));
-    }
+    // public void Decline(string eKey)
+    // {
+    //     StartCoroutine(DeleteInvite(eKey));
+    // }
 
-    IEnumerator DeleteInvite(string key)
-    {
-        var DBTask = db.Child("users").Child(User.UserId).Child("invites").GetValueAsync();
-        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+    // IEnumerator DeleteInvite(string key)
+    // {
+    //     var DBTask = db.Child("users").Child(User.UserId).Child("invites").GetValueAsync();
+    //     yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
 
-        if (DBTask.Exception != null)
-        {
-            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
-        }
-        else if (DBTask.Result.Value == null)
-        {
-            Debug.Log("This user has no data");
-        }
-        else
-        {
-            DataSnapshot snapshot = DBTask.Result;
+    //     if (DBTask.Exception != null)
+    //     {
+    //         Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+    //     }
+    //     else if (DBTask.Result.Value == null)
+    //     {
+    //         Debug.Log("This user has no data");
+    //     }
+    //     else
+    //     {
+    //         DataSnapshot snapshot = DBTask.Result;
 
-            foreach (var child in snapshot.Children)
-            {
-                if (child.Key.ToString() == key)
-                {
-                    Debug.Log("Deleted invite");
-                    db.Child("users").Child(User.UserId).Child("invites").Child(key).RemoveValueAsync();
+    //         foreach (var child in snapshot.Children)
+    //         {
+    //             if (child.Key.ToString() == key)
+    //             {
+    //                 Debug.Log("Deleted invite");
+    //                 db.Child("users").Child(User.UserId).Child("invites").Child(key).RemoveValueAsync();
 
-                    playerData.inviteEntryKeys.Remove(key);
-                    playerData.inviteKeys.RemoveAt(playerData.inviteEntryKeys.IndexOf(key));
-                    playerData.inviteTitles.RemoveAt(playerData.inviteEntryKeys.IndexOf(key));
-                    playerData.inviteGms.RemoveAt(playerData.inviteEntryKeys.IndexOf(key));
-                }
-            }
+    //                 playerData.inviteEntryKeys.Remove(key);
+    //                 playerData.inviteKeys.RemoveAt(playerData.inviteEntryKeys.IndexOf(key));
+    //                 playerData.inviteTitles.RemoveAt(playerData.inviteEntryKeys.IndexOf(key));
+    //                 playerData.inviteGms.RemoveAt(playerData.inviteEntryKeys.IndexOf(key));
+    //             }
+    //         }
 
-            invites.Refresh();
-        }
-    }
+    //         invites.Refresh();
+    //     }
+    // }
 
     //Character Stuff
     public void LoadCharacters(string key)

@@ -8,6 +8,8 @@ using FullSerializer;
 public class ActiveCampaign : MonoBehaviour
 {
 
+    public static fsSerializer serializer = new fsSerializer();
+
     [Header("Campaign Data")]
     public string campaignName;
     public string key;
@@ -110,13 +112,59 @@ public class ActiveCampaign : MonoBehaviour
 
     public void Invite()
     {
+
         if (inviteField.text != "")
         {
-            Debug.Log(inviteField.text);
-            FirebaseManager.Instance.Invite(inviteField.text);
+            RestClient.Get(AccountManager.Instance.uri + "/users.json?auth=" + AccountManager.Instance.idToken)
+            .Then(response =>
+            {
+                fsData userData = fsJsonParser.Parse(response.Text);
+                Dictionary<string, User> users = null;
+                serializer.TryDeserialize(userData, ref users);
 
-            inviteField.text = "";
-            invite.SetActive(false);
+                bool playerFound = false;
+                bool messageSent = false;
+
+                foreach (var user in users)
+                {
+                    if (user.Value.email == inviteField.text)
+                    {
+                        Debug.Log(user.Value.email);
+                        playerFound = true;
+
+                        User tempUser = user.Value;
+
+                        Invite newInvite = new Invite()
+                        {
+                            key = this.key,
+                            title = this.name,
+                            gm = PlayerData.Instance.user.username
+                        };
+
+                        if (tempUser.invites == null)
+                            tempUser.invites = new List<string>();
+
+                        tempUser.invites.Add(key);
+                        
+                        RestClient.Put(AccountManager.Instance.uri + "/users/" + tempUser.localId + ".json?auth=" + AccountManager.Instance.idToken, tempUser)
+                            .Catch(error =>
+                            {
+                                Debug.Log(error);
+                            });
+                    }
+                }
+
+                if (!playerFound && !messageSent)
+                {
+                    InviteInfo(1);
+                }
+                else if (playerFound && !messageSent)
+                {
+                    InviteInfo(6);
+                }
+            });
+
+
         }
         else
         {

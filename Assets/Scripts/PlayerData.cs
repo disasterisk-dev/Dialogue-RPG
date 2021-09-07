@@ -17,18 +17,12 @@ public class PlayerData : MonoBehaviour
     public bool gm;
     public List<string> players;
 
-    [Header("Campaigns")]
+    [Header("Class Arrays")]
 
     public List<Campaign> campaigns;
     //public bool gameMaster;
-
+    public List<Invite> invites;
     public List<Character> characters;
-
-    [Header("Invites")]
-    public List<string> inviteEntryKeys;
-    public List<string> inviteKeys;
-    public List<string> inviteTitles;
-    public List<string> inviteGms;
 
     [Header("New Campaign Temp Data")]
     public string tempGameMaster;
