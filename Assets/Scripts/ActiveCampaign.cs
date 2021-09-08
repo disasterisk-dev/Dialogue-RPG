@@ -30,7 +30,6 @@ public class ActiveCampaign : MonoBehaviour
     public GameObject playerSettings;
     public GameObject invite;
     public TMP_InputField inviteField;
-    public TMP_Text inviteInfo;
 
     void OnEnable()
     {
@@ -43,7 +42,6 @@ public class ActiveCampaign : MonoBehaviour
         gmSettings.SetActive(false);
         playerSettings.SetActive(false);
         invite.SetActive(false);
-        inviteInfo.gameObject.SetActive(false);
         //firebaseManager.LoadCharacters(key);
     }
 
@@ -107,7 +105,6 @@ public class ActiveCampaign : MonoBehaviour
     public void ShowInvite()
     {
         invite.SetActive(true);
-        inviteInfo.gameObject.SetActive(false);
     }
 
     public void Invite()
@@ -123,45 +120,55 @@ public class ActiveCampaign : MonoBehaviour
                 serializer.TryDeserialize(userData, ref users);
 
                 bool playerFound = false;
-                bool messageSent = false;
 
                 foreach (var user in users)
                 {
                     if (user.Value.email == inviteField.text)
                     {
-                        Debug.Log(user.Value.email);
                         playerFound = true;
+                        Debug.Log(user.Value.email);
 
                         User tempUser = user.Value;
 
-                        Invite newInvite = new Invite()
+                        if (tempUser.localId != PlayerData.Instance.user.localId)
                         {
-                            key = this.key,
-                            title = this.name,
-                            gm = PlayerData.Instance.user.username
-                        };
-
-                        if (tempUser.invites == null)
-                            tempUser.invites = new List<string>();
-
-                        tempUser.invites.Add(key);
-                        
-                        RestClient.Put(AccountManager.Instance.uri + "/users/" + tempUser.localId + ".json?auth=" + AccountManager.Instance.idToken, tempUser)
-                            .Catch(error =>
+                            if (!tempUser.invites.Contains(key))
                             {
-                                Debug.Log(error);
-                            });
+                                Invite newInvite = new Invite()
+                                {
+                                    key = this.key,
+                                    title = this.name,
+                                    gm = PlayerData.Instance.user.username
+                                };
+
+                                if (tempUser.invites == null)
+                                    tempUser.invites = new List<string>();
+
+                                tempUser.invites.Add(key);
+
+                                RestClient.Put(AccountManager.Instance.uri + "/users/" + tempUser.localId + ".json?auth=" + AccountManager.Instance.idToken, tempUser)
+                                .Then(r =>
+                                {
+                                    UIManager.Instance.Warning(tempUser.username + " has been invited to join " + campaignName + "!");
+                                })
+                                .Catch(error =>
+                                 {
+                                     UIManager.Instance.Warning("Something went wrong, invitation not sent");
+                                 });
+                            }
+                            else
+                            {
+                                UIManager.Instance.Warning(tempUser + " has already been invited to join this campaign");
+                            }
+                        }
+                        else
+                        {
+                            UIManager.Instance.Warning("Cannot send invitations to yourself");
+                        }
                     }
                 }
-
-                if (!playerFound && !messageSent)
-                {
-                    InviteInfo(1);
-                }
-                else if (playerFound && !messageSent)
-                {
-                    InviteInfo(6);
-                }
+                if (!playerFound)
+                    UIManager.Instance.Warning("No player found with that email address");
             });
 
 
@@ -170,29 +177,8 @@ public class ActiveCampaign : MonoBehaviour
         {
             Debug.Log("No email entered");
         }
-    }
-
-    public void InviteInfo(int output)
-    {
-        switch (output)
-        {
-            case 0:
-                inviteInfo.text = "Invite sent!";
-                break;
-            case 1:
-                inviteInfo.text = "Player not found";
-                break;
-            case 2:
-                inviteInfo.text = "Player's inbox is full";
-                break;
-            case 3:
-                inviteInfo.text = "Invalid email entered";
-                break;
-            default:
-                inviteInfo.text = "Something went wrong";
-                break;
-        }
-        inviteInfo.gameObject.SetActive(true);
+        invite.SetActive(false);
+        inviteField.text = "";
     }
 
 }

@@ -139,69 +139,7 @@ public class FirebaseManager : MonoBehaviour
     }
 
     //Invite Stuff
-    public void Invite(string email)
-    {
-        StartCoroutine(InvitePlayer(email));
-    }
 
-    IEnumerator InvitePlayer(string email)
-    {
-        var DBTask = db.Child("users").GetValueAsync();
-        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
-
-        if (DBTask.Exception != null)
-        {
-            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
-        }
-        else if (DBTask.Result.Value == null)
-        {
-            Debug.Log("This user has no data");
-        }
-        else
-        {
-            DataSnapshot snapshot = DBTask.Result;
-
-            bool playerFound = false;
-            bool messageSent = false;
-
-            foreach (var child in snapshot.Children)
-            {
-                //Debug.Log(child.Child("email").Value.ToString());
-
-                if (child.Child("email").Value.ToString() == email) //finds user matching the email entered
-                {
-                    playerFound = true;
-                    Debug.Log("Email found");
-
-                    if (child.Child("invites").ChildrenCount < 4) //checks if found user has less than 4 invites already
-                    {
-                        string inviteKey = db.Child("users").Child(child.Key).Child("invites").Push().Key;
-
-                        db.Child("users").Child(child.Key).Child("invites").Child(inviteKey).Child("key").SetValueAsync(playerData.key);
-                        db.Child("users").Child(child.Key).Child("invites").Child(inviteKey).Child("title").SetValueAsync(playerData.campaignName);
-                        db.Child("users").Child(child.Key).Child("invites").Child(inviteKey).Child("gamemaster").SetValueAsync(User.DisplayName);
-
-                        activeCampaign.InviteInfo(0);
-                        messageSent = true;
-                    }
-                    else
-                    {
-                        activeCampaign.InviteInfo(2);
-                        messageSent = true;
-                    }
-                }
-            }
-
-            if (!playerFound && !messageSent)
-            {
-                activeCampaign.InviteInfo(1);
-            }
-            else if (playerFound && !messageSent)
-            {
-                activeCampaign.InviteInfo(6);
-            }
-        }
-    }
 
     // IEnumerator GetInviteKeys()
     // {

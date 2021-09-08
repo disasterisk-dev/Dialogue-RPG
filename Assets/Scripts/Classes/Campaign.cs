@@ -10,6 +10,8 @@ public class Campaign
     public string genre;
     public string gamemaster;
     public string gmid;
+    public List<string> playerIds;
+    public List<string> playerNames;
 
     public Campaign()
     {

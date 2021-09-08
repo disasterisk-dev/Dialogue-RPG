@@ -30,12 +30,71 @@ public class InvitationCard : MonoBehaviour
 
     public void Accept()
     {
+        Campaign joinCamp;
 
-        Destroy(gameObject);
+        if (PlayerData.Instance.user.campaigns.Count < 4)
+        {
+            RestClient.Get<Campaign>(AccountManager.Instance.uri + "/campaigns/" + key + "/.json?auth=" + AccountManager.Instance.idToken)
+            .Then(response =>
+            {
+                joinCamp = response;
+
+                if (joinCamp.playerIds == null)
+                    joinCamp.playerIds = new List<string>();
+
+                joinCamp.playerIds.Add(PlayerData.Instance.user.localId);
+                RestClient.Put(AccountManager.Instance.uri + "/campaigns/" + key + ".json?auth=" + AccountManager.Instance.idToken, joinCamp)
+                .Then(response2 =>
+                {
+                    //Adding campaign key to user entry
+
+                    if (PlayerData.Instance.user.campaigns == null)
+                        PlayerData.Instance.user.campaigns = new List<string>();
+
+                    PlayerData.Instance.user.campaigns.Add(key);
+                    PlayerData.Instance.user.invites.Remove(key);
+
+                    RestClient.Put(AccountManager.Instance.uri + "/users/" + PlayerData.Instance.user.localId + ".json?auth=" + AccountManager.Instance.idToken, PlayerData.Instance.user)
+                    .Then(response3 =>
+                    {
+                        Destroy(gameObject);
+                    })
+                   .Catch(error3 =>
+                    {
+                        Debug.Log("Couldn't update player data:" + error3);
+                    });
+                })
+               .Catch(error2 =>
+                {
+                    Debug.Log("Couldn't send updated campaign data:" + error2);
+                });
+
+
+            }).Catch(error =>
+                {
+                    Debug.Log("Couldn't retrieve campaign:" + error);
+                });
+        }
+        else
+        {
+            UIManager.Instance.Warning("Your campaign limit has been reached, to join this campaign you must leave one that you are currently participating in.");
+        }
+
+
     }
 
     public void Decline()
     {
-        Destroy(gameObject);
+        PlayerData.Instance.user.invites.Remove(key);
+
+        RestClient.Put(AccountManager.Instance.uri + "/users/" + PlayerData.Instance.user.localId + ".json?auth=" + AccountManager.Instance.idToken, PlayerData.Instance.user)
+        .Then(response3 =>
+        {
+            Destroy(gameObject);
+        })
+        .Catch(error3 =>
+        {
+            Debug.Log("Couldn't update player data:" + error3);
+        });
     }
 }

@@ -37,12 +37,22 @@ public class CampaignCard : MonoBehaviour
         {
             title.text = campaignName;
             gameMaster.text = gmName + "'s";
-            players.text = "PLAYERS:\n\n";
-            
-            foreach(string name in playerNames)
+
+            if (playerNames != null)
             {
-                players.text += name + "\n";
+                players.text = "PLAYERS:\n\n";
+
+                foreach (string name in playerNames)
+                {
+                    players.text += name + "\n";
+                }
             }
+            else
+            {
+                players.text = "";
+            }
+
+
         }
         catch
         {

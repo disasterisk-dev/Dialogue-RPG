@@ -10,7 +10,8 @@ public class UIManager : MonoBehaviour
 
     //Screen object variables
     public GameObject[] screens;
-
+    public GameObject warning;
+    public TMP_Text warningText;
     Campaigns campaigns;
 
     private void Awake()
@@ -26,6 +27,7 @@ public class UIManager : MonoBehaviour
 
     public void ClearScreen() //Turn off all screens
     {
+        warning.SetActive(false);
         foreach (GameObject obj in screens)
         {
             obj.SetActive(false);
@@ -36,5 +38,16 @@ public class UIManager : MonoBehaviour
     {
         ClearScreen();
         screens[i].SetActive(true);
+    }
+
+    public void Warning(string message)
+    {
+        warningText.text = message;
+        warning.SetActive(true);
+    }
+
+    public void Okay()
+    {
+        warning.SetActive(false);
     }
 }

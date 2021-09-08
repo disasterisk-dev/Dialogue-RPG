@@ -35,17 +35,33 @@ public class Campaigns : MonoBehaviour
                 {
                     if (campaigns.ContainsKey(k))
                     {
-                        PlayerData.Instance.campaigns.Add(new Campaign()
+                        if (campaigns[k].playerIds != null)
                         {
-                            title = campaigns[k].title,
-                            key = k,
-                            genre = campaigns[k].genre,
-                            gamemaster = campaigns[k].gamemaster,
-                            gmid = campaigns[k].gmid
-                        });
+                            foreach (string id in campaigns[k].playerIds)
+                            {
+                                RestClient.Get(AccountManager.Instance.uri + "/users/" + id + ".json?auth=" + AccountManager.Instance.idToken)
+                                .Then(response2 =>
+                                {
+                                    fsData userData = fsJsonParser.Parse(response2.Text);
+                                    User user = null;
+                                    serializer.TryDeserialize(userData, ref user);
+
+                                    if(campaigns[k].playerNames == null)
+                                        campaigns[k].playerNames = new List<string>();
+
+                                    campaigns[k].playerNames.Add(user.username);
+                            })
+                                .Catch(error =>
+                                {
+                                    Debug.Log(error);
+                                });
+                            }
+                        }
+
+                        PlayerData.Instance.campaigns.Add(campaigns[k]);
                     }
                 }
-
+                Debug.Log("Loading");
                 Refresh();
             });
     }
@@ -99,8 +115,8 @@ public class Campaigns : MonoBehaviour
                 campaign.genre = PlayerData.Instance.campaigns[i].genre;
                 campaign.gmName = PlayerData.Instance.campaigns[i].gamemaster;
                 campaign.gmId = PlayerData.Instance.campaigns[i].gmid;
-                //campaign.playerNames = playerData.campaigns[i].playerNames;
-                //campaign.playerIDs = playerData.campaigns[i].playerIDs;
+                campaign.playerNames = PlayerData.Instance.campaigns[i].playerNames;
+                campaign.playerIDs = PlayerData.Instance.campaigns[i].playerIds;
 
                 campaign.SetData();
             }
