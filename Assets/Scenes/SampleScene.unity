@@ -8096,9 +8096,6 @@ MonoBehaviour:
     weapon: 
     clothing: 
     relic: 
-    background: 
-    features: 
-    notes: 
 --- !u!4 &624360564
 Transform:
   m_ObjectHideFlags: 0
@@ -14875,7 +14872,7 @@ GameObject:
   - component: {fileID: 1276011184}
   - component: {fileID: 1276011183}
   m_Layer: 5
-  m_Name: Next
+  m_Name: Create
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15393,7 +15390,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1332715401
 RectTransform:
   m_ObjectHideFlags: 0
@@ -22265,7 +22262,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1976403892
 RectTransform:
   m_ObjectHideFlags: 0
@@ -22692,6 +22689,7 @@ MonoBehaviour:
     playerNames: []
     characters: []
   isGM: 0
+  hasChar: 0
   title: {fileID: 786454419}
   zones:
   - {fileID: 1120499091}

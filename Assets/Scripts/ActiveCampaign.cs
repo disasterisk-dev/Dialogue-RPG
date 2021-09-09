@@ -15,6 +15,7 @@ public class ActiveCampaign : MonoBehaviour
     [Header("Campaign Data")]
     public Campaign activeCampaign = new Campaign();
     public bool isGM;
+    public bool hasChar;
 
     [Header("UI Elements")]
     public TMP_Text title;
@@ -213,41 +214,37 @@ public class ActiveCampaign : MonoBehaviour
             }
         }
 
-        if(activeCampaign.characters == null)
+        if (activeCampaign.characters == null)
             activeCampaign.characters = new List<Character>();
 
-        bool hasChar = false;
+        hasChar = false;
 
-        foreach(Character c in activeCampaign.characters)
+        foreach (Character c in activeCampaign.characters)
         {
-            if(c.id == PlayerData.Instance.user.localId)
+            if (c.id == PlayerData.Instance.user.localId)
                 hasChar = true;
         }
 
-        if (PlayerData.Instance.characters.Count == 0 && !isGM)
+        if (activeCampaign.characters.Count == 0 && !isGM && !hasChar)
         {
             Instantiate(newCharacter, zones[0].transform);
         }
         else
         {
-            if (activeCampaign.characters != null)
+            for (int i = 0; i < activeCampaign.characters.Count; i++)
             {
-                for (int i = 0; i < activeCampaign.characters.Count; i++)
-                {
-                    GameObject card = Instantiate(characterCard, zones[i].transform);
-                    CharacterCard character = card.GetComponent<CharacterCard>();
+                Debug.Log(activeCampaign.characters[i].name);
+                GameObject card = Instantiate(characterCard, zones[i].transform);
+                CharacterCard character = card.GetComponent<CharacterCard>();
 
-                    character.characterData = activeCampaign.characters[i];
+                character.characterData = activeCampaign.characters[i];
 
-                    character.SetData();
-                }
+                character.SetData();
             }
-            else
+
+            if (!isGM && !hasChar)
             {
-                if(!isGM && !hasChar)
-                {
-                    Instantiate(newCharacter, zones[0].transform);
-                }
+                Instantiate(newCharacter, zones[0].transform);
             }
 
             Debug.Log("Character cards loaded");

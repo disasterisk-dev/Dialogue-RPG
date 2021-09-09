@@ -20,11 +20,6 @@ public class Character
     public string clothing;
     public string relic;
 
-    [Header("Details")]
-    public string background;
-    public string features;
-    public string notes;
-
     public Character()
     {
 

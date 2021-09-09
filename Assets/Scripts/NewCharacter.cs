@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using Proyecto26;
+using FullSerializer;
 
 public class NewCharacter : MonoBehaviour
 {
+    public static fsSerializer serializer = new fsSerializer();
     public TMP_InputField nameInput;
     public NewCharStats statsRef;
     // Start is called before the first frame update
@@ -41,6 +44,26 @@ public class NewCharacter : MonoBehaviour
         PlayerData.Instance.tempChar.will = statsRef.stats[2];
         PlayerData.Instance.tempChar.want = statsRef.stats[3];
 
-        UIManager.Instance.LoadScreen(9);
+        Create();
+        UIManager.Instance.LoadScreen(5);
+    }
+
+    public void Create()
+    {
+        if(ActiveCampaign.Instance.activeCampaign.characters == null)
+            ActiveCampaign.Instance.activeCampaign.characters = new List<Character>();
+
+        ActiveCampaign.Instance.activeCampaign.characters.Add(PlayerData.Instance.tempChar);
+
+        RestClient.Put(AccountManager.Instance.uri + "/campaigns/" + ActiveCampaign.Instance.activeCampaign.key + ".json?auth=" + AccountManager.Instance.idToken, ActiveCampaign.Instance.activeCampaign)
+        .Then(response =>
+        {
+            Debug.Log(response.Text);
+            UIManager.Instance.LoadScreen(2);
+        })
+        .Catch(error =>
+        {
+            Debug.Log(error);
+        });
     }
 }

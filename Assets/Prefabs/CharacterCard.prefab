@@ -35,7 +35,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 41, y: -968}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 450, y: 675}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1398880426319463641
@@ -90,7 +90,6 @@ MonoBehaviour:
   characterData:
     name: 
     id: 
-    campaign: 
     word: 0
     wit: 0
     will: 0
@@ -98,6 +97,3 @@ MonoBehaviour:
     weapon: 
     clothing: 
     relic: 
-    background: 
-    features: 
-    notes: 
