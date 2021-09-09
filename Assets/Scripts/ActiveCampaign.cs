@@ -7,18 +7,14 @@ using FullSerializer;
 
 public class ActiveCampaign : MonoBehaviour
 {
+    public static ActiveCampaign instance;
+    public static ActiveCampaign Instance { get { return instance; } }
 
     public static fsSerializer serializer = new fsSerializer();
 
     [Header("Campaign Data")]
-    public string campaignName;
-    public string key;
-    public string genre;
-    public bool gm;
-    public List<string> playerKeys;
-    public List<bool> characterSetup;
-
-    public Character[] characters;
+    public Campaign activeCampaign = new Campaign();
+    public bool isGM;
 
     [Header("UI Elements")]
     public TMP_Text title;
@@ -31,18 +27,27 @@ public class ActiveCampaign : MonoBehaviour
     public GameObject invite;
     public TMP_InputField inviteField;
 
+    [Header("Prefabs")]
+    public GameObject newCharacter;
+    public GameObject characterCard;
+
+    void Awake()
+    {
+        instance = this;
+    }
+
     void OnEnable()
     {
-        campaignName = PlayerData.Instance.campaignName;
-        key = PlayerData.Instance.key;
-        genre = PlayerData.Instance.genre;
-        gm = PlayerData.Instance.gm;
+        activeCampaign = PlayerData.Instance.activeCampaign;
 
-        title.text = campaignName;
+        isGM = activeCampaign.gmid == PlayerData.Instance.user.localId ? true : false;
+
+        title.text = activeCampaign.title;
         gmSettings.SetActive(false);
         playerSettings.SetActive(false);
         invite.SetActive(false);
-        //firebaseManager.LoadCharacters(key);
+
+        LoadCharacters();
     }
 
     void Start()
@@ -58,7 +63,7 @@ public class ActiveCampaign : MonoBehaviour
 
     public void Settings()
     {
-        if (gm)
+        if (isGM)
         {
             if (!gmSettings.activeInHierarchy)
             {
@@ -84,10 +89,10 @@ public class ActiveCampaign : MonoBehaviour
 
     public void Delete()
     {
-        RestClient.Delete(AccountManager.Instance.uri + "/campaigns/" + key + ".json?auth=" + AccountManager.Instance.idToken)
+        RestClient.Delete(AccountManager.Instance.uri + "/campaigns/" + activeCampaign.key + ".json?auth=" + AccountManager.Instance.idToken)
         .Then(response =>
         {
-            PlayerData.Instance.user.campaigns.Remove(key);
+            PlayerData.Instance.user.campaigns.Remove(activeCampaign.key);
             RestClient.Put(AccountManager.Instance.uri + "/users/" + AccountManager.Instance.localId + ".json?auth=" + AccountManager.Instance.idToken, PlayerData.Instance.user)
                     .Catch(error =>
                     {
@@ -121,54 +126,70 @@ public class ActiveCampaign : MonoBehaviour
 
                 bool playerFound = false;
 
-                foreach (var user in users)
+                foreach (var user in users.Values)
                 {
-                    if (user.Value.email == inviteField.text)
+                    if (user.email == inviteField.text)
                     {
                         playerFound = true;
-                        Debug.Log(user.Value.email);
 
-                        User tempUser = user.Value;
+
+                        User tempUser = user;
 
                         if (tempUser.localId != PlayerData.Instance.user.localId)
                         {
-                            if (!tempUser.invites.Contains(key))
+                            if (tempUser.invites == null)
+                                tempUser.invites = new List<string>();
+
+                            if (!tempUser.invites.Contains(activeCampaign.key))
                             {
                                 Invite newInvite = new Invite()
                                 {
-                                    key = this.key,
-                                    title = this.name,
+                                    key = activeCampaign.key,
+                                    title = activeCampaign.title,
                                     gm = PlayerData.Instance.user.username
                                 };
 
                                 if (tempUser.invites == null)
                                     tempUser.invites = new List<string>();
 
-                                tempUser.invites.Add(key);
+                                tempUser.invites.Add(activeCampaign.key);
 
                                 RestClient.Put(AccountManager.Instance.uri + "/users/" + tempUser.localId + ".json?auth=" + AccountManager.Instance.idToken, tempUser)
                                 .Then(r =>
                                 {
-                                    UIManager.Instance.Warning(tempUser.username + " has been invited to join " + campaignName + "!");
+                                    UIManager.Instance.Warning(tempUser.username + " has been invited to join " + activeCampaign.title + "!");
+                                    invite.SetActive(false);
+                                    inviteField.text = "";
                                 })
                                 .Catch(error =>
                                  {
                                      UIManager.Instance.Warning("Something went wrong, invitation not sent");
+                                     invite.SetActive(false);
+                                     inviteField.text = "";
                                  });
                             }
                             else
                             {
                                 UIManager.Instance.Warning(tempUser + " has already been invited to join this campaign");
+                                invite.SetActive(false);
+                                inviteField.text = "";
                             }
                         }
                         else
                         {
                             UIManager.Instance.Warning("Cannot send invitations to yourself");
+                            invite.SetActive(false);
+                            inviteField.text = "";
                         }
                     }
                 }
+
                 if (!playerFound)
                     UIManager.Instance.Warning("No player found with that email address");
+            })
+            .Catch(error =>
+            {
+                Debug.Log("Couldn't get player list: " + error);
             });
 
 
@@ -177,8 +198,60 @@ public class ActiveCampaign : MonoBehaviour
         {
             Debug.Log("No email entered");
         }
-        invite.SetActive(false);
-        inviteField.text = "";
+    }
+
+    void LoadCharacters()
+    {
+        foreach (GameObject obj in zones)
+        {
+            if (obj.transform.childCount > 0)
+            {
+                foreach (Transform child in obj.transform)
+                {
+                    Destroy(child.gameObject);
+                }
+            }
+        }
+
+        if(activeCampaign.characters == null)
+            activeCampaign.characters = new List<Character>();
+
+        bool hasChar = false;
+
+        foreach(Character c in activeCampaign.characters)
+        {
+            if(c.id == PlayerData.Instance.user.localId)
+                hasChar = true;
+        }
+
+        if (PlayerData.Instance.characters.Count == 0 && !isGM)
+        {
+            Instantiate(newCharacter, zones[0].transform);
+        }
+        else
+        {
+            if (activeCampaign.characters != null)
+            {
+                for (int i = 0; i < activeCampaign.characters.Count; i++)
+                {
+                    GameObject card = Instantiate(characterCard, zones[i].transform);
+                    CharacterCard character = card.GetComponent<CharacterCard>();
+
+                    character.characterData = activeCampaign.characters[i];
+
+                    character.SetData();
+                }
+            }
+            else
+            {
+                if(!isGM && !hasChar)
+                {
+                    Instantiate(newCharacter, zones[0].transform);
+                }
+            }
+
+            Debug.Log("Character cards loaded");
+        }
     }
 
 }

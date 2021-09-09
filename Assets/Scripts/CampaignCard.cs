@@ -13,13 +13,7 @@ public class CampaignCard : MonoBehaviour
     public GameObject text;
 
     [Header("Data")]
-    public string campaignName;
-    public string key;
-    public string gmName;
-    public string gmId;
-    public string genre;
-    public List<string> playerNames;
-    public List<string> playerIDs;
+    public Campaign campaignData = new Campaign();
     void Start()
     {
 
@@ -35,14 +29,14 @@ public class CampaignCard : MonoBehaviour
     {
         try
         {
-            title.text = campaignName;
-            gameMaster.text = gmName + "'s";
+            title.text = campaignData.title;
+            gameMaster.text = campaignData.gamemaster + "'s";
 
-            if (playerNames != null)
+            if (campaignData.playerNames != null)
             {
                 players.text = "PLAYERS:\n\n";
 
-                foreach (string name in playerNames)
+                foreach (string name in campaignData.playerNames)
                 {
                     players.text += name + "\n";
                 }
@@ -58,5 +52,11 @@ public class CampaignCard : MonoBehaviour
         {
             Debug.Log("bitch ass exception strikes again");
         }
+    }
+    public void Load()
+    {
+        PlayerData.Instance.activeCampaign = campaignData;
+
+        UIManager.Instance.LoadScreen(5);
     }
 }

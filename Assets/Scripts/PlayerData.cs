@@ -11,11 +11,7 @@ public class PlayerData : MonoBehaviour
     public User user;
 
     [Header("Active Campaign")]
-    public string campaignName;
-    public string key;
-    public string genre;
-    public bool gm;
-    public List<string> players;
+    public Campaign activeCampaign;
 
     [Header("Class Arrays")]
 
@@ -24,10 +20,12 @@ public class PlayerData : MonoBehaviour
     public List<Invite> invites;
     public List<Character> characters;
 
-    [Header("New Campaign Temp Data")]
+    [Header("Temp Data")]
     public string tempGameMaster;
     public string tempGenre;
     public string tempCampaignName;
+
+    public Character tempChar = new Character();
 
     private void Awake()
     {

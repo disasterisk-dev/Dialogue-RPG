@@ -110,13 +110,7 @@ public class Campaigns : MonoBehaviour
                 GameObject card = Instantiate(CampaignCard, zones[i].transform);
                 CampaignCard campaign = card.GetComponent<CampaignCard>();
 
-                campaign.key = PlayerData.Instance.campaigns[i].key;
-                campaign.campaignName = PlayerData.Instance.campaigns[i].title;
-                campaign.genre = PlayerData.Instance.campaigns[i].genre;
-                campaign.gmName = PlayerData.Instance.campaigns[i].gamemaster;
-                campaign.gmId = PlayerData.Instance.campaigns[i].gmid;
-                campaign.playerNames = PlayerData.Instance.campaigns[i].playerNames;
-                campaign.playerIDs = PlayerData.Instance.campaigns[i].playerIds;
+                campaign.campaignData = PlayerData.Instance.campaigns[i];
 
                 campaign.SetData();
             }

@@ -16,17 +16,5 @@ public class LoadCampaign : MonoBehaviour
         
     }
 
-    public void Load()
-    {
-
-        //firebaseManager.LoadCharacters(this.GetComponent<CampaignCard>().key);
- 
-        PlayerData.Instance.campaignName = this.GetComponent<CampaignCard>().campaignName;
-        PlayerData.Instance.key = this.GetComponent<CampaignCard>().key;
-        PlayerData.Instance.genre = this.GetComponent<CampaignCard>().genre;
-        PlayerData.Instance.gm = this.GetComponent<CampaignCard>().gmId == PlayerData.Instance.user.localId ? true : false;
-        PlayerData.Instance.players = this.GetComponent<CampaignCard>().playerIDs;
-
-        UIManager.Instance.LoadScreen(5);
-    }
+    
 }

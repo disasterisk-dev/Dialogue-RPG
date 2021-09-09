@@ -8,7 +8,6 @@ public class Character
     [Header("Basics")]
     public string name;
     public string id;
-    public string campaign;
 
     [Header("Stats")]
     public float word;

@@ -12,6 +12,7 @@ public class Campaign
     public string gmid;
     public List<string> playerIds;
     public List<string> playerNames;
+    public List<Character> characters;
 
     public Campaign()
     {
