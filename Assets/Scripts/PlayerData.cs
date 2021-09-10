@@ -12,6 +12,7 @@ public class PlayerData : MonoBehaviour
 
     [Header("Active Campaign")]
     public Campaign activeCampaign;
+    public Character activeCharacter;
 
     [Header("Class Arrays")]
 

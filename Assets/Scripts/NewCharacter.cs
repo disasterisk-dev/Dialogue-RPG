@@ -59,7 +59,7 @@ public class NewCharacter : MonoBehaviour
         .Then(response =>
         {
             Debug.Log(response.Text);
-            UIManager.Instance.LoadScreen(2);
+            UIManager.Instance.LoadScreen(5);
         })
         .Catch(error =>
         {

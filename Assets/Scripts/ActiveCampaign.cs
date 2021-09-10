@@ -223,6 +223,7 @@ public class ActiveCampaign : MonoBehaviour
         {
             if (c.id == PlayerData.Instance.user.localId)
                 hasChar = true;
+                PlayerData.Instance.activeCharacter = c;
         }
 
         if (activeCampaign.characters.Count == 0 && !isGM && !hasChar)
@@ -238,13 +239,14 @@ public class ActiveCampaign : MonoBehaviour
                 CharacterCard character = card.GetComponent<CharacterCard>();
 
                 character.characterData = activeCampaign.characters[i];
+                character.player = activeCampaign.playerNames[activeCampaign.playerIds.IndexOf(activeCampaign.characters[i].id)];
 
                 character.SetData();
             }
 
             if (!isGM && !hasChar)
             {
-                Instantiate(newCharacter, zones[0].transform);
+                Instantiate(newCharacter, zones[activeCampaign.characters.Count].transform);
             }
 
             Debug.Log("Character cards loaded");

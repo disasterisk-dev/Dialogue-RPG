@@ -42,7 +42,11 @@ public class InvitationCard : MonoBehaviour
                 if (joinCamp.playerIds == null)
                     joinCamp.playerIds = new List<string>();
 
+                if (joinCamp.playerNames == null)
+                    joinCamp.playerNames = new List<string>();
+
                 joinCamp.playerIds.Add(PlayerData.Instance.user.localId);
+                joinCamp.playerNames.Add(PlayerData.Instance.user.username);
                 RestClient.Put(AccountManager.Instance.uri + "/campaigns/" + key + ".json?auth=" + AccountManager.Instance.idToken, joinCamp)
                 .Then(response2 =>
                 {
@@ -58,6 +62,7 @@ public class InvitationCard : MonoBehaviour
                     .Then(response3 =>
                     {
                         Destroy(gameObject);
+                        GameObject.Find("Invites").GetComponent<Invites>().Refresh();
                     })
                    .Catch(error3 =>
                     {
@@ -91,6 +96,7 @@ public class InvitationCard : MonoBehaviour
         .Then(response3 =>
         {
             Destroy(gameObject);
+            GameObject.Find("Invites").GetComponent<Invites>().Refresh();
         })
         .Catch(error3 =>
         {

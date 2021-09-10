@@ -46,10 +46,10 @@ public class Campaigns : MonoBehaviour
                                     User user = null;
                                     serializer.TryDeserialize(userData, ref user);
 
-                                    if(campaigns[k].playerNames == null)
-                                        campaigns[k].playerNames = new List<string>();
+                                    // if(campaigns[k].playerNames == null)
+                                    //     campaigns[k].playerNames = new List<string>();
 
-                                    campaigns[k].playerNames.Add(user.username);
+                                    // campaigns[k].playerNames.Add(user.username);
                             })
                                 .Catch(error =>
                                 {
