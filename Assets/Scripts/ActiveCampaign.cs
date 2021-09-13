@@ -9,8 +9,8 @@ public class ActiveCampaign : MonoBehaviour
 {
     public static ActiveCampaign instance;
     public static ActiveCampaign Instance { get { return instance; } }
-
     public static fsSerializer serializer = new fsSerializer();
+    bool inGame;
 
     [Header("Campaign Data")]
     public Campaign activeCampaign = new Campaign();
@@ -49,17 +49,7 @@ public class ActiveCampaign : MonoBehaviour
         invite.SetActive(false);
 
         LoadCharacters();
-    }
-
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+        StartCoroutine(DataRefresh());
     }
 
     public void Settings()
@@ -234,7 +224,6 @@ public class ActiveCampaign : MonoBehaviour
         {
             for (int i = 0; i < activeCampaign.characters.Count; i++)
             {
-                Debug.Log(activeCampaign.characters[i].name);
                 GameObject card = Instantiate(characterCard, zones[i].transform);
                 CharacterCard character = card.GetComponent<CharacterCard>();
 
@@ -248,8 +237,43 @@ public class ActiveCampaign : MonoBehaviour
             {
                 Instantiate(newCharacter, zones[activeCampaign.characters.Count].transform);
             }
+        }
+    }
 
-            Debug.Log("Character cards loaded");
+    IEnumerator DataRefresh()
+    {
+        if(!gameObject.activeInHierarchy)
+        {
+            yield break;
+        }
+        else
+        {
+            inGame = true;
+        }
+
+        while(inGame)
+        {
+            yield return new WaitForSeconds(5f);
+
+            RestClient.Get<Campaign>(AccountManager.Instance.uri + "/campaigns/" + activeCampaign.key + ".json?auth=" + AccountManager.Instance.idToken)
+            .Then(response =>
+            {
+                if(response != activeCampaign)
+                {
+                    Debug.Log("Updated game data");
+                    activeCampaign = response;
+                    LoadCharacters();
+                }
+                else
+                {
+                    Debug.Log("No changes to game data");
+                }
+            })
+            .Catch(error =>
+            {
+                Debug.Log("Error updating game data: " + error);
+                UIManager.Instance.Warning("Error updating game data: " + error);
+            });
         }
     }
 

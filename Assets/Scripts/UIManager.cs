@@ -12,6 +12,9 @@ public class UIManager : MonoBehaviour
     public GameObject[] screens;
     public GameObject warning;
     public TMP_Text warningText;
+    public GameObject rollDialogue;
+
+    public TMP_Text rollStat, rollRoll, rollSum;
     Campaigns campaigns;
 
     private void Awake()
@@ -28,6 +31,8 @@ public class UIManager : MonoBehaviour
     public void ClearScreen() //Turn off all screens
     {
         warning.SetActive(false);
+        rollDialogue.SetActive(false);
+
         foreach (GameObject obj in screens)
         {
             obj.SetActive(false);
@@ -46,8 +51,26 @@ public class UIManager : MonoBehaviour
         warning.SetActive(true);
     }
 
+    public void Roll(string stat, float roll, float statValue)
+    {
+        rollStat.text = stat;
+        rollRoll.text = (roll + statValue).ToString();
+
+        if(statValue < 0)
+        {
+            rollSum.text = "(" + roll.ToString() + statValue.ToString() + ")";
+        }
+        else
+        {
+            rollSum.text = "(" + roll.ToString() + "+" + statValue.ToString() + ")";
+        }
+        
+        rollDialogue.SetActive(true);
+    }
+
     public void Okay()
     {
         warning.SetActive(false);
+        rollDialogue.SetActive(false);
     }
 }
