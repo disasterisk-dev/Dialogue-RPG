@@ -23,6 +23,9 @@ public class ActiveCampaign : MonoBehaviour
 
 
     [Header("Settings UI Elements")]
+    public GameObject gmDrawer;
+    public GameObject discard;
+    public GameObject cardBlock;
     public GameObject gmSettings;
     public GameObject playerSettings;
     public GameObject invite;
@@ -31,6 +34,8 @@ public class ActiveCampaign : MonoBehaviour
     [Header("Prefabs")]
     public GameObject newCharacter;
     public GameObject characterCard;
+    public GameObject genericCard;
+    public GameObject itemCard;
 
     void Awake()
     {
@@ -43,10 +48,13 @@ public class ActiveCampaign : MonoBehaviour
 
         isGM = activeCampaign.gmid == PlayerData.Instance.user.localId ? true : false;
 
+        gmDrawer.SetActive(isGM);
+
         title.text = activeCampaign.title;
         gmSettings.SetActive(false);
         playerSettings.SetActive(false);
         invite.SetActive(false);
+        cardBlock.SetActive(false);
 
         LoadCharacters();
         StartCoroutine(DataRefresh());
@@ -213,7 +221,7 @@ public class ActiveCampaign : MonoBehaviour
         {
             if (c.id == PlayerData.Instance.user.localId)
                 hasChar = true;
-                PlayerData.Instance.activeCharacter = c;
+            PlayerData.Instance.activeCharacter = c;
         }
 
         if (activeCampaign.characters.Count == 0 && !isGM && !hasChar)
@@ -240,9 +248,45 @@ public class ActiveCampaign : MonoBehaviour
         }
     }
 
+    public void DrawCard(string cardType)
+    {
+        int get;
+        Card tempCard = new Card();
+        GameObject cardObj;
+        GenericCard genCard;
+
+        switch (cardType)
+        {
+            case "hook":
+                get = Random.Range(0, CardManager.Instance.hookCards.Count);
+                tempCard = CardManager.Instance.hookCards[get];
+                CardManager.Instance.hookCards.RemoveAt(get);
+                break;
+
+            case "event":
+                get = Random.Range(0, CardManager.Instance.eventCards.Count);
+                tempCard = CardManager.Instance.eventCards[get];
+                break;
+
+            case "npc":
+                get = Random.Range(0, CardManager.Instance.npcCards.Count);
+                tempCard = CardManager.Instance.npcCards[get];
+                break;
+
+        }
+
+        cardBlock.SetActive(true);
+
+        cardObj = Instantiate(genericCard, transform);
+        genCard = cardObj.GetComponent<GenericCard>();
+
+        genCard.cardData = tempCard;
+        genCard.SetData();
+    }
+
     IEnumerator DataRefresh()
     {
-        if(!gameObject.activeInHierarchy)
+        if (!gameObject.activeInHierarchy)
         {
             yield break;
         }
@@ -251,14 +295,14 @@ public class ActiveCampaign : MonoBehaviour
             inGame = true;
         }
 
-        while(inGame)
+        while (inGame)
         {
             yield return new WaitForSeconds(5f);
 
             RestClient.Get<Campaign>(AccountManager.Instance.uri + "/campaigns/" + activeCampaign.key + ".json?auth=" + AccountManager.Instance.idToken)
             .Then(response =>
             {
-                if(response != activeCampaign)
+                if (response != activeCampaign)
                 {
                     Debug.Log("Updated game data");
                     activeCampaign = response;
