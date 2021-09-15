@@ -8,7 +8,7 @@ public class PlayerData : MonoBehaviour
     public static PlayerData Instance { get { return instance; } }
 
     [Header("Credentials")]
-    public User user;
+    public User user = new User();
 
     [Header("Active Campaign")]
     public Campaign activeCampaign;

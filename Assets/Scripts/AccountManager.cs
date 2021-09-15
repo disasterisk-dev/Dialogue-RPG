@@ -80,6 +80,7 @@ public class AccountManager : MonoBehaviour
         .Catch(error =>
         {
             Debug.Log("Could not register user: " + error);
+            UIManager.Instance.Warning("Could not register user\nError: " + error.Message);
         });
     }
 
@@ -114,6 +115,7 @@ public class AccountManager : MonoBehaviour
         .Catch(error =>
         {
             Debug.Log("Could not login user: " + error);
+            UIManager.Instance.Warning("Could not log in\nError: " + error.Message);
         });
     }
 
@@ -124,23 +126,30 @@ public class AccountManager : MonoBehaviour
 
     public void RegisterButton()
     {
-        if (usernameRegisterField.text != null && emailRegisterField.text != null && passwordRegisterField.text != null && passwordRegisterVerifyField.text != null)
+        if (usernameRegisterField.text != "" && emailRegisterField.text != "" && passwordRegisterField.text != "" && passwordRegisterVerifyField.text != "")
         {
-            if (passwordRegisterField.text == passwordRegisterVerifyField.text)
+            if (passwordRegisterField.text.Length >= 8)
             {
-                user.username = usernameRegisterField.text;
-                user.email = emailRegisterField.text;
+                if (passwordRegisterField.text == passwordRegisterVerifyField.text)
+                {
+                    user.username = usernameRegisterField.text;
+                    user.email = emailRegisterField.text;
 
-                SignUp(emailRegisterField.text, usernameRegisterField.text, passwordRegisterField.text);
+                    SignUp(emailRegisterField.text, usernameRegisterField.text, passwordRegisterField.text);
+                }
+                else
+                {
+                    UIManager.Instance.Warning("Passwords do not match");
+                }
             }
             else
             {
-                StartCoroutine(Warning(warningRegisterText, "Passwords do not match"));
+                UIManager.Instance.Warning("Password is not long enough");
             }
         }
         else
         {
-            StartCoroutine(Warning(warningRegisterText, "Please fill in all fields"));
+            UIManager.Instance.Warning("Please fill in all fields");
         }
     }
 

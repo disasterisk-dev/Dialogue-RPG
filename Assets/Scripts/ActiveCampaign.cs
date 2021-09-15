@@ -30,6 +30,7 @@ public class ActiveCampaign : MonoBehaviour
     public GameObject playerSettings;
     public GameObject invite;
     public TMP_InputField inviteField;
+    public GameObject settingsButton;
 
     [Header("Prefabs")]
     public GameObject newCharacter;
@@ -66,10 +67,12 @@ public class ActiveCampaign : MonoBehaviour
         {
             if (!gmSettings.activeInHierarchy)
             {
+                settingsButton.SetActive(false);
                 gmSettings.SetActive(true);
             }
             else if (gmSettings.activeInHierarchy)
             {
+                settingsButton.SetActive(true);
                 gmSettings.SetActive(false);
             }
         }
@@ -77,10 +80,12 @@ public class ActiveCampaign : MonoBehaviour
         {
             if (!playerSettings.activeInHierarchy)
             {
+                settingsButton.SetActive(false);
                 playerSettings.SetActive(true);
             }
             else if (playerSettings.activeInHierarchy)
             {
+                settingsButton.SetActive(true);
                 playerSettings.SetActive(false);
             }
         }
@@ -91,14 +96,36 @@ public class ActiveCampaign : MonoBehaviour
         RestClient.Delete(AccountManager.Instance.uri + "/campaigns/" + activeCampaign.key + ".json?auth=" + AccountManager.Instance.idToken)
         .Then(response =>
         {
+            //Deleting campaign key from each of the players who are part of it
+            if(activeCampaign.playerIds != null)
+            {
+                foreach (string player in activeCampaign.playerIds)
+            {
+                RestClient.Get<User>(AccountManager.Instance.uri + "/users/" + player + ".json?auth=" + AccountManager.Instance.idToken)
+                .Then(response2 =>
+                {
+                    response2.campaigns.Remove(activeCampaign.key);
+                    RestClient.Put(AccountManager.Instance.uri + "/users/" + player + ".json?auth=" + AccountManager.Instance.idToken, response2);
+                })
+                .Catch(error2 =>
+                {
+                    Debug.Log("Error deleting campaign from players: " + error2);
+                });
+            }
+            }
+
             PlayerData.Instance.user.campaigns.Remove(activeCampaign.key);
             RestClient.Put(AccountManager.Instance.uri + "/users/" + AccountManager.Instance.localId + ".json?auth=" + AccountManager.Instance.idToken, PlayerData.Instance.user)
-                    .Catch(error =>
-                    {
-                        Debug.Log(error);
-                    });
-            Debug.Log("Deleted");
-            UIManager.Instance.LoadScreen(2);
+                .Then(response3 =>
+                {
+                    Debug.Log("Deleted");
+                    UIManager.Instance.LoadScreen(2);
+                })
+                .Catch(error =>
+                {
+                    Debug.Log(error);
+                });
+            
         })
         .Catch(error =>
         {
@@ -246,6 +273,26 @@ public class ActiveCampaign : MonoBehaviour
                 Instantiate(newCharacter, zones[activeCampaign.characters.Count].transform);
             }
         }
+    }
+
+    public void DrawItem()
+    {
+        int get;
+        Item tempCard = new Item();
+        GameObject cardObj;
+        ItemCard item;
+
+        get = Random.Range(0, CardManager.Instance.itemCards.Count);
+        tempCard = CardManager.Instance.itemCards[get];
+        CardManager.Instance.itemCards.RemoveAt(get);
+
+        cardBlock.SetActive(true);
+
+        cardObj = Instantiate(itemCard, transform);
+        item = cardObj.GetComponent<ItemCard>();
+
+        item.itemData = tempCard;
+        item.SetData();
     }
 
     public void DrawCard(string cardType)

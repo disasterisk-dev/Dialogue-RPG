@@ -7,8 +7,11 @@ using UnityEngine.UI;
 public class Item
 {
     public string title;
-    public string text;
+    [TextArea]public string text;
     public Sprite sprite;
     public string stat;
     public float bonus;
+    public float level;
+    public enum cardType {weapon, clothing, relic, misc};
+    public cardType type;
 }

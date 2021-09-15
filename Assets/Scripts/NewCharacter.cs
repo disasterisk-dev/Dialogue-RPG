@@ -14,13 +14,13 @@ public class NewCharacter : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     public void New()
@@ -31,26 +31,39 @@ public class NewCharacter : MonoBehaviour
 
     public void AddName()
     {
-        PlayerData.Instance.tempChar.name = nameInput.text;
-        UIManager.Instance.LoadScreen(8);
+        if (nameInput.text != "")
+        {
+            PlayerData.Instance.tempChar.name = nameInput.text;
+            UIManager.Instance.LoadScreen(8);
+        }
+        else
+        {
+            UIManager.Instance.Warning("No name entered");
+        }
     }
 
-    
+
 
     public void AddStats()
     {
-        PlayerData.Instance.tempChar.word = statsRef.stats[0];
-        PlayerData.Instance.tempChar.wit = statsRef.stats[1];
-        PlayerData.Instance.tempChar.will = statsRef.stats[2];
-        PlayerData.Instance.tempChar.want = statsRef.stats[3];
+        if (statsRef.points == 0)
+        {
+            PlayerData.Instance.tempChar.word = statsRef.stats[0];
+            PlayerData.Instance.tempChar.wit = statsRef.stats[1];
+            PlayerData.Instance.tempChar.will = statsRef.stats[2];
+            PlayerData.Instance.tempChar.want = statsRef.stats[3];
 
-        Create();
-        UIManager.Instance.LoadScreen(5);
+            UIManager.Instance.LoadScreen(9);
+        }
+        else
+        {
+            UIManager.Instance.Warning("Make sure to use all your points!");
+        }
     }
 
     public void Create()
     {
-        if(ActiveCampaign.Instance.activeCampaign.characters == null)
+        if (ActiveCampaign.Instance.activeCampaign.characters == null)
             ActiveCampaign.Instance.activeCampaign.characters = new List<Character>();
 
         ActiveCampaign.Instance.activeCampaign.characters.Add(PlayerData.Instance.tempChar);

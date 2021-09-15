@@ -1,24 +1,34 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using DentedPixel;
 
 public class Hover : MonoBehaviour
 {
-    public Component shadow;
+    public float moveDistance;
+    public float time;
     // Start is called before the first frame update
-    void Start()
+
+    private void Awake() 
     {
-        
+        gameObject.GetComponent<Button>().onClick.AddListener(() => Reset());
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnMouseEnter()
     {
-        
+        if(gameObject.GetComponent<Button>().interactable)
+            LeanTween.moveLocalY(this.gameObject, moveDistance, time);
     }
 
-    private void OnMouseOver() 
+    private void OnMouseExit()
     {
+        if(gameObject.GetComponent<Button>().interactable)
+            LeanTween.moveLocalY(this.gameObject, 0f, time);
+    }
 
+    private void Reset() 
+    {
+        transform.LeanSetLocalPosY(0f);
     }
 }

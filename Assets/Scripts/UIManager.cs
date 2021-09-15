@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class UIManager : MonoBehaviour
@@ -13,6 +14,9 @@ public class UIManager : MonoBehaviour
     public GameObject warning;
     public TMP_Text warningText;
     public GameObject rollDialogue;
+    public GameObject cautionDialogue;
+    public TMP_Text cautionText;
+    public Button cautionButton;
 
     public TMP_Text rollStat, rollRoll, rollSum;
     Campaigns campaigns;
@@ -32,6 +36,7 @@ public class UIManager : MonoBehaviour
     {
         warning.SetActive(false);
         rollDialogue.SetActive(false);
+        cautionDialogue.SetActive(false);
 
         foreach (GameObject obj in screens)
         {
@@ -49,6 +54,22 @@ public class UIManager : MonoBehaviour
     {
         warningText.text = message;
         warning.SetActive(true);
+    }
+
+    public void Caution(int functionCode)
+    {
+        switch(functionCode)
+        {
+            case 0:
+                cautionText.text = "Warning! \n\n This campaign will be permanently deleted and all players will lose access";
+                cautionButton.onClick.AddListener(() => ActiveCampaign.Instance.Delete());
+                break;
+            default:
+                cautionButton.onClick.AddListener(() => Okay());
+                break;
+        }
+
+        cautionDialogue.SetActive(true);
     }
 
     public void Roll(string stat, float roll, float statValue)
@@ -72,5 +93,6 @@ public class UIManager : MonoBehaviour
     {
         warning.SetActive(false);
         rollDialogue.SetActive(false);
+        cautionDialogue.SetActive(false);
     }
 }

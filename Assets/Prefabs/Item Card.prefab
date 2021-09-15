@@ -86,6 +86,7 @@ GameObject:
   - component: {fileID: 4472853778344000619}
   - component: {fileID: 8191210960620002299}
   - component: {fileID: 5652743346800470287}
+  - component: {fileID: 1584370543798571335}
   m_Layer: 5
   m_Name: Item Card
   m_TagString: Untagged
@@ -137,7 +138,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.6981132, g: 0.34270668, b: 0.33259168, a: 1}
+  m_Color: {r: 0.83137256, g: 0.8, b: 0.58431375, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -153,6 +154,30 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1584370543798571335
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2039041726961925052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d17c92f46e310774c8fd267c6f2d1ba4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemData:
+    title: 
+    text: 
+    sprite: {fileID: 0}
+    stat: 
+    bonus: 0
+    level: 0
+    type: 0
+  title: {fileID: 6645626847945383756}
+  copy: {fileID: 5638850651835157024}
+  mod: {fileID: 285949435792052693}
+  image: {fileID: 7874356556594677474}
 --- !u!1 &4701608095248321148
 GameObject:
   m_ObjectHideFlags: 0

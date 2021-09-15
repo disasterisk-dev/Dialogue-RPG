@@ -9,6 +9,10 @@ public class Character
     public string name;
     public string id;
 
+    [Header("Details")]
+    [TextArea] public string background;
+    [TextArea] public string features;
+
     [Header("Stats")]
     public float word;
     public float wit;
@@ -16,16 +20,15 @@ public class Character
     public float want;
 
     [Header("Gear")]
-    public string weapon;
-    public string clothing;
-    public string relic;
+    public Item weapon;
+    public Item clothing;
+    public Item relic;
+
+    [Header("Levelling")]
+    public float level;
+    public float points;
 
     public Character()
-    {
-
-    }
-    
-    public Character(string name, string id, string campaign, float word, float wit, float will, float want, string weapon, string clothing, string relic, string background, string features)
     {
 
     }
