@@ -9,7 +9,8 @@ public class Item
     public string title;
     [TextArea]public string text;
     public Sprite sprite;
-    public string stat;
+    public enum statType {none, word, wit, will, want};
+    public statType stat;
     public float bonus;
     public float level;
     public enum cardType {weapon, clothing, relic, misc};

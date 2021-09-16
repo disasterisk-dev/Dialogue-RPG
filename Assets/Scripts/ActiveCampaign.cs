@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 using Proyecto26;
 using FullSerializer;
@@ -31,12 +32,19 @@ public class ActiveCampaign : MonoBehaviour
     public GameObject invite;
     public TMP_InputField inviteField;
     public GameObject settingsButton;
+    public GameObject[] cardButtons;
 
     [Header("Prefabs")]
     public GameObject newCharacter;
     public GameObject characterCard;
     public GameObject genericCard;
     public GameObject itemCard;
+
+    [Header("Item Giving")]
+    public bool giving;
+    public Item giveItem = new Item();
+
+    public bool blocked;
 
     void Awake()
     {
@@ -50,12 +58,13 @@ public class ActiveCampaign : MonoBehaviour
         isGM = activeCampaign.gmid == PlayerData.Instance.user.localId ? true : false;
 
         gmDrawer.SetActive(isGM);
+        settingsButton.SetActive(true);
 
         title.text = activeCampaign.title;
         gmSettings.SetActive(false);
         playerSettings.SetActive(false);
         invite.SetActive(false);
-        cardBlock.SetActive(false);
+        blocked = false;
 
         LoadCharacters();
         StartCoroutine(DataRefresh());
@@ -88,6 +97,30 @@ public class ActiveCampaign : MonoBehaviour
                 settingsButton.SetActive(true);
                 playerSettings.SetActive(false);
             }
+        }
+    }
+
+    public void Block()
+    {
+        if(!blocked)
+        {
+            cardBlock.SetActive(true);
+            settingsButton.GetComponent<Button>().interactable = false;
+            foreach(GameObject card in cardButtons)
+            {
+                card.GetComponent<Button>().interactable = false;
+            }
+            blocked = true;
+        }
+        else
+        {
+            cardBlock.SetActive(false);
+            settingsButton.GetComponent<Button>().interactable = true;
+            foreach(GameObject card in cardButtons)
+            {
+                card.GetComponent<Button>().interactable = true;
+            }
+            blocked = false;
         }
     }
 
@@ -286,7 +319,7 @@ public class ActiveCampaign : MonoBehaviour
         tempCard = CardManager.Instance.itemCards[get];
         CardManager.Instance.itemCards.RemoveAt(get);
 
-        cardBlock.SetActive(true);
+        Block();
 
         cardObj = Instantiate(itemCard, transform);
         item = cardObj.GetComponent<ItemCard>();
@@ -322,7 +355,7 @@ public class ActiveCampaign : MonoBehaviour
 
         }
 
-        cardBlock.SetActive(true);
+        Block();
 
         cardObj = Instantiate(genericCard, transform);
         genCard = cardObj.GetComponent<GenericCard>();
@@ -344,20 +377,20 @@ public class ActiveCampaign : MonoBehaviour
 
         while (inGame)
         {
-            yield return new WaitForSeconds(5f);
+            yield return new WaitForSeconds(10f);
 
             RestClient.Get<Campaign>(AccountManager.Instance.uri + "/campaigns/" + activeCampaign.key + ".json?auth=" + AccountManager.Instance.idToken)
             .Then(response =>
             {
-                if (response != activeCampaign)
+                if (response == activeCampaign)
+                {
+                    Debug.Log("No changes to game data");
+                }
+                else
                 {
                     Debug.Log("Updated game data");
                     activeCampaign = response;
                     LoadCharacters();
-                }
-                else
-                {
-                    Debug.Log("No changes to game data");
                 }
             })
             .Catch(error =>
