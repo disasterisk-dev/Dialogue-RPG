@@ -25,8 +25,8 @@ public class Character
     public Item relic;
 
     [Header("Levelling")]
-    public float level;
-    public float points;
+    public float level = 1;
+    public float points = 0;
 
     public Character()
     {

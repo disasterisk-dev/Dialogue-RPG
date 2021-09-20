@@ -44,6 +44,9 @@ public class ActiveCampaign : MonoBehaviour
     public bool giving;
     public Item giveItem = new Item();
 
+    [Header("Points/Leveling")]
+    public bool pointGive;
+    public bool playerLevelling;
     public bool blocked;
 
     void Awake()
@@ -65,6 +68,10 @@ public class ActiveCampaign : MonoBehaviour
         playerSettings.SetActive(false);
         invite.SetActive(false);
         blocked = false;
+
+        pointGive = false;
+        giving = false;
+        playerLevelling = false;
 
         LoadCharacters();
         StartCoroutine(DataRefresh());
@@ -362,6 +369,11 @@ public class ActiveCampaign : MonoBehaviour
 
         genCard.cardData = tempCard;
         genCard.SetData();
+    }
+
+    public void AwardPoint()
+    {
+        pointGive = true;
     }
 
     IEnumerator DataRefresh()

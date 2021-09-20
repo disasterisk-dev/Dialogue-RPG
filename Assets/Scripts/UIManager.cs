@@ -11,14 +11,32 @@ public class UIManager : MonoBehaviour
 
     //Screen object variables
     public GameObject[] screens;
+
+    [Header("Warning Dialogue")]
     public GameObject warning;
     public TMP_Text warningText;
+
+    [Header("Roll Dialogue")]
     public GameObject rollDialogue;
+    public TMP_Text rollStat;
+    public TMP_Text rollRoll;
+    public TMP_Text rollSum;
+
+    [Header("CautionDialogue")]
     public GameObject cautionDialogue;
     public TMP_Text cautionText;
     public Button cautionButton;
 
-    public TMP_Text rollStat, rollRoll, rollSum;
+    [Header("Level Up Dialogue")]
+
+    public GameObject levelUpDialogue;
+    public TMP_Text levelStat;
+    public TMP_Text levelNum;
+    public Button increase;
+    public Button decrease;
+    public Button levelOkay;
+
+
     Campaigns campaigns;
 
     private void Awake()
@@ -37,6 +55,7 @@ public class UIManager : MonoBehaviour
         warning.SetActive(false);
         rollDialogue.SetActive(false);
         cautionDialogue.SetActive(false);
+        levelUpDialogue.SetActive(false);
 
         foreach (GameObject obj in screens)
         {
@@ -58,7 +77,7 @@ public class UIManager : MonoBehaviour
 
     public void Caution(int functionCode)
     {
-        switch(functionCode)
+        switch (functionCode)
         {
             case 0:
                 cautionText.text = "Warning! \n\n This campaign will be permanently deleted and all players will lose access";
@@ -77,7 +96,7 @@ public class UIManager : MonoBehaviour
         rollStat.text = stat;
         rollRoll.text = (roll + statValue).ToString();
 
-        if(statValue < 0)
+        if (statValue < 0)
         {
             rollSum.text = "(" + roll.ToString() + statValue.ToString() + ")";
         }
@@ -85,8 +104,55 @@ public class UIManager : MonoBehaviour
         {
             rollSum.text = "(" + roll.ToString() + "+" + statValue.ToString() + ")";
         }
-        
+
         rollDialogue.SetActive(true);
+    }
+
+    public void LevelUp(string stat, float statValue, CharacterCard card)
+    {
+        float tempValue = 0;
+
+        levelStat.text = stat;
+        levelNum.text = statValue.ToString();
+
+        increase.onClick.AddListener(() =>
+        {
+            tempValue = statValue + 1;
+            levelNum.text = tempValue.ToString();
+        });
+
+        decrease.onClick.AddListener(() =>
+        {
+            tempValue = statValue - 1;
+            levelNum.text = tempValue.ToString();
+        });
+
+        levelOkay.onClick.AddListener(() =>
+        {
+            if (tempValue != 0)
+            {
+                switch (stat)
+                {
+                    case "Word":
+                        card.characterData.word = tempValue;
+                        break;
+                    case "Wit":
+                        card.characterData.wit = tempValue;
+                        break;
+                    case "Will":
+                        card.characterData.will = tempValue;
+                        break;
+                    case "Want":
+                        card.characterData.want = tempValue;
+                        break;
+                }
+
+                card.ConcludeLevelUp();
+                Okay();
+            }
+        });
+
+        levelUpDialogue.SetActive(true);
     }
 
     public void Okay()
@@ -94,5 +160,6 @@ public class UIManager : MonoBehaviour
         warning.SetActive(false);
         rollDialogue.SetActive(false);
         cautionDialogue.SetActive(false);
+        levelUpDialogue.SetActive(false);
     }
 }

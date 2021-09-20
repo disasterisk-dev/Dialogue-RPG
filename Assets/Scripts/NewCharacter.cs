@@ -66,6 +66,8 @@ public class NewCharacter : MonoBehaviour
         if (ActiveCampaign.Instance.activeCampaign.characters == null)
             ActiveCampaign.Instance.activeCampaign.characters = new List<Character>();
 
+        PlayerData.Instance.tempChar.level = 1;
+
         ActiveCampaign.Instance.activeCampaign.characters.Add(PlayerData.Instance.tempChar);
 
         RestClient.Put(AccountManager.Instance.uri + "/campaigns/" + ActiveCampaign.Instance.activeCampaign.key + ".json?auth=" + AccountManager.Instance.idToken, ActiveCampaign.Instance.activeCampaign)

@@ -24,37 +24,8 @@ public class GenericCard : MonoBehaviour
 
     public void Discard()
     {
-        if (!discarded)
-        {
-            ActiveCampaign.Instance.cardBlock.SetActive(false);
-
-            CardManager.Instance.discard.Add(cardData);
-
-            if (ActiveCampaign.Instance.discard.transform.childCount > 0)
-            {
-                foreach (Transform child in ActiveCampaign.Instance.discard.transform)
-                {
-                    Destroy(child.gameObject);
-                }
-            }
-
-            gameObject.transform.SetParent(ActiveCampaign.Instance.discard.transform);
-            gameObject.transform.localPosition = Vector3.zero;
-            gameObject.transform.localScale = Vector3.one;
-
-            discarded = true;
-        }
-        else
-        {
-            ActiveCampaign.Instance.cardBlock.SetActive(true);
-
-            CardManager.Instance.discard.Remove(cardData);
-
-            gameObject.transform.SetParent(GameObject.Find("Gameplay").transform);
-            gameObject.transform.localPosition = Vector3.zero;
-            gameObject.transform.localScale = new Vector3(2f, 2f, 1f);
-
-            discarded = false;
-        }
+        ActiveCampaign.Instance.Block();
+        CardManager.Instance.discard.Remove(cardData);
+        Destroy(gameObject);
     }
 }
