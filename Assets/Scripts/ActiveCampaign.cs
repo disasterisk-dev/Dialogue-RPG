@@ -24,14 +24,12 @@ public class ActiveCampaign : MonoBehaviour
 
 
     [Header("Settings UI Elements")]
+
+    public GameObject[] options;
     public GameObject gmDrawer;
     public GameObject discard;
     public GameObject cardBlock;
-    public GameObject gmSettings;
-    public GameObject playerSettings;
-    public GameObject invite;
     public TMP_InputField inviteField;
-    public GameObject settingsButton;
     public GameObject[] cardButtons;
 
     [Header("Prefabs")]
@@ -61,12 +59,25 @@ public class ActiveCampaign : MonoBehaviour
         isGM = activeCampaign.gmid == PlayerData.Instance.user.localId ? true : false;
 
         gmDrawer.SetActive(isGM);
-        settingsButton.SetActive(true);
+
+        if(!isGM)
+        {
+            foreach(GameObject o in options)
+            {
+                o.SetActive(false);
+            }
+            options[0].SetActive(true);
+            options[1].SetActive(true);
+        }
+        else
+        {
+            foreach(GameObject o in options)
+            {
+                o.SetActive(true);
+            }
+        }
 
         title.text = activeCampaign.title;
-        gmSettings.SetActive(false);
-        playerSettings.SetActive(false);
-        invite.SetActive(false);
         blocked = false;
 
         pointGive = false;
@@ -77,55 +88,31 @@ public class ActiveCampaign : MonoBehaviour
         StartCoroutine(DataRefresh());
     }
 
-    public void Settings()
-    {
-        if (isGM)
-        {
-            if (!gmSettings.activeInHierarchy)
-            {
-                settingsButton.SetActive(false);
-                gmSettings.SetActive(true);
-            }
-            else if (gmSettings.activeInHierarchy)
-            {
-                settingsButton.SetActive(true);
-                gmSettings.SetActive(false);
-            }
-        }
-        else
-        {
-            if (!playerSettings.activeInHierarchy)
-            {
-                settingsButton.SetActive(false);
-                playerSettings.SetActive(true);
-            }
-            else if (playerSettings.activeInHierarchy)
-            {
-                settingsButton.SetActive(true);
-                playerSettings.SetActive(false);
-            }
-        }
-    }
-
     public void Block()
     {
-        if(!blocked)
+        if (!blocked)
         {
             cardBlock.SetActive(true);
-            settingsButton.GetComponent<Button>().interactable = false;
-            foreach(GameObject card in cardButtons)
+            foreach (GameObject card in cardButtons)
             {
                 card.GetComponent<Button>().interactable = false;
+            }
+            foreach (GameObject option in options)
+            {
+                option.GetComponent<Button>().interactable = false;
             }
             blocked = true;
         }
         else
         {
             cardBlock.SetActive(false);
-            settingsButton.GetComponent<Button>().interactable = true;
-            foreach(GameObject card in cardButtons)
+            foreach (GameObject card in cardButtons)
             {
                 card.GetComponent<Button>().interactable = true;
+            }
+            foreach (GameObject option in options)
+            {
+                option.GetComponent<Button>().interactable = true;
             }
             blocked = false;
         }
@@ -137,21 +124,21 @@ public class ActiveCampaign : MonoBehaviour
         .Then(response =>
         {
             //Deleting campaign key from each of the players who are part of it
-            if(activeCampaign.playerIds != null)
+            if (activeCampaign.playerIds != null)
             {
                 foreach (string player in activeCampaign.playerIds)
-            {
-                RestClient.Get<User>(AccountManager.Instance.uri + "/users/" + player + ".json?auth=" + AccountManager.Instance.idToken)
-                .Then(response2 =>
                 {
-                    response2.campaigns.Remove(activeCampaign.key);
-                    RestClient.Put(AccountManager.Instance.uri + "/users/" + player + ".json?auth=" + AccountManager.Instance.idToken, response2);
-                })
-                .Catch(error2 =>
-                {
-                    Debug.Log("Error deleting campaign from players: " + error2);
-                });
-            }
+                    RestClient.Get<User>(AccountManager.Instance.uri + "/users/" + player + ".json?auth=" + AccountManager.Instance.idToken)
+                    .Then(response2 =>
+                    {
+                        response2.campaigns.Remove(activeCampaign.key);
+                        RestClient.Put(AccountManager.Instance.uri + "/users/" + player + ".json?auth=" + AccountManager.Instance.idToken, response2);
+                    })
+                    .Catch(error2 =>
+                    {
+                        Debug.Log("Error deleting campaign from players: " + error2);
+                    });
+                }
             }
 
             PlayerData.Instance.user.campaigns.Remove(activeCampaign.key);
@@ -165,17 +152,12 @@ public class ActiveCampaign : MonoBehaviour
                 {
                     Debug.Log(error);
                 });
-            
+
         })
         .Catch(error =>
         {
             Debug.Log("Couldn't Delete campaign: " + error);
         });
-    }
-
-    public void ShowInvite()
-    {
-        invite.SetActive(true);
     }
 
     public void Invite()
@@ -224,27 +206,23 @@ public class ActiveCampaign : MonoBehaviour
                                 .Then(r =>
                                 {
                                     UIManager.Instance.Warning(tempUser.username + " has been invited to join " + activeCampaign.title + "!");
-                                    invite.SetActive(false);
                                     inviteField.text = "";
                                 })
                                 .Catch(error =>
                                  {
                                      UIManager.Instance.Warning("Something went wrong, invitation not sent");
-                                     invite.SetActive(false);
                                      inviteField.text = "";
                                  });
                             }
                             else
                             {
                                 UIManager.Instance.Warning(tempUser + " has already been invited to join this campaign");
-                                invite.SetActive(false);
                                 inviteField.text = "";
                             }
                         }
                         else
                         {
                             UIManager.Instance.Warning("Cannot send invitations to yourself");
-                            invite.SetActive(false);
                             inviteField.text = "";
                         }
                     }
@@ -325,6 +303,7 @@ public class ActiveCampaign : MonoBehaviour
         get = Random.Range(0, CardManager.Instance.itemCards.Count);
         tempCard = CardManager.Instance.itemCards[get];
         CardManager.Instance.itemCards.RemoveAt(get);
+        CardManager.Instance.itemCards.Add(tempCard);
 
         Block();
 
@@ -337,7 +316,6 @@ public class ActiveCampaign : MonoBehaviour
 
     public void DrawCard(string cardType)
     {
-        int get;
         Card tempCard = new Card();
         GameObject cardObj;
         GenericCard genCard;
@@ -345,19 +323,21 @@ public class ActiveCampaign : MonoBehaviour
         switch (cardType)
         {
             case "hook":
-                get = Random.Range(0, CardManager.Instance.hookCards.Count);
-                tempCard = CardManager.Instance.hookCards[get];
-                CardManager.Instance.hookCards.RemoveAt(get);
+                tempCard = CardManager.Instance.hookCards[0];
+                CardManager.Instance.hookCards.RemoveAt(0);
+                CardManager.Instance.hookCards.Add(tempCard);
                 break;
 
             case "event":
-                get = Random.Range(0, CardManager.Instance.eventCards.Count);
-                tempCard = CardManager.Instance.eventCards[get];
+                tempCard = CardManager.Instance.eventCards[0];
+                CardManager.Instance.eventCards.RemoveAt(0);
+                CardManager.Instance.eventCards.Add(tempCard);
                 break;
 
             case "npc":
-                get = Random.Range(0, CardManager.Instance.npcCards.Count);
-                tempCard = CardManager.Instance.npcCards[get];
+                tempCard = CardManager.Instance.npcCards[0];
+                CardManager.Instance.npcCards.RemoveAt(0);
+                CardManager.Instance.npcCards.Add(tempCard);
                 break;
 
         }

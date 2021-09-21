@@ -9,6 +9,8 @@ public class UIManager : MonoBehaviour
     public static UIManager instance;
     public static UIManager Instance { get { return instance; } }
 
+    public int version, release, patch;
+    public TMP_Text versionText;
     //Screen object variables
     public GameObject[] screens;
 
@@ -28,7 +30,6 @@ public class UIManager : MonoBehaviour
     public Button cautionButton;
 
     [Header("Level Up Dialogue")]
-
     public GameObject levelUpDialogue;
     public TMP_Text levelStat;
     public TMP_Text levelNum;
@@ -36,15 +37,16 @@ public class UIManager : MonoBehaviour
     public Button decrease;
     public Button levelOkay;
 
+    [Header("Invite Dialogue")]
+    public GameObject InviteDialogue;
 
     Campaigns campaigns;
 
     private void Awake()
     {
         instance = this;
-
         //campaigns = GameObject.Find("Campaigns").GetComponent<Campaigns>();
-
+        versionText.text = "Build " + Application.version;
         LoadScreen(0);
     }
 
@@ -56,6 +58,7 @@ public class UIManager : MonoBehaviour
         rollDialogue.SetActive(false);
         cautionDialogue.SetActive(false);
         levelUpDialogue.SetActive(false);
+        InviteDialogue.SetActive(false);
 
         foreach (GameObject obj in screens)
         {
@@ -89,6 +92,11 @@ public class UIManager : MonoBehaviour
         }
 
         cautionDialogue.SetActive(true);
+    }
+
+    public void Invite()
+    {
+        InviteDialogue.SetActive(true);
     }
 
     public void Roll(string stat, float roll, float statValue)
@@ -161,5 +169,6 @@ public class UIManager : MonoBehaviour
         rollDialogue.SetActive(false);
         cautionDialogue.SetActive(false);
         levelUpDialogue.SetActive(false);
+        InviteDialogue.SetActive(false);
     }
 }

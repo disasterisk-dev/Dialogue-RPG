@@ -1,0 +1,24 @@
+fileFormatVersion: 2
+guid: 6938de762d9305846a3a7fa49084ccd2
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Villages
+  fontNames:
+  - Villages
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 852be9af7f58c91429abdac2af8c2944, type: 3}
+  - {fileID: 12800000, guid: 674e19bfee999ab4db70d161a669ff9c, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

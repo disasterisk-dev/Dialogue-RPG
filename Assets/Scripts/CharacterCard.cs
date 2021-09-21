@@ -25,6 +25,7 @@ public class CharacterCard : MonoBehaviour
     public Image relic;
     public Button[] buttons;
     public Image[] points;
+    public Image star;
 
     private void OnEnable()
     {
@@ -72,21 +73,27 @@ public class CharacterCard : MonoBehaviour
 
     public void SetPoints()
     {
+        foreach (Image i in points)
+        {
+            i.color = new Color32(255, 255, 255, 100);
+        }
+
         for (int i = 0; i < characterData.points; i++)
         {
-            points[i].color = new Color32(248, 48, 48, 255);
+            points[i].color = new Color32(255, 255, 255, 255);
         }
 
-        if (characterData.points == 0)
+        if (characterData.points == 5)
         {
-            foreach (Image i in points)
-            {
-                i.color = new Color32(255, 255, 255, 255);
-            }
+            ActiveCampaign.Instance.playerLevelling = true;
+            star.color = new Color32(229, 204, 53, 255);
+        }
+        else
+        {
+            ActiveCampaign.Instance.playerLevelling = false;
+            star.color = new Color32(255, 255, 255, 255);
         }
 
-        if(characterData.points == 5)
-            ActiveCampaign.Instance.playerLevelling = true;
     }
 
     public float ModSum(Item.statType _type)
@@ -151,7 +158,7 @@ public class CharacterCard : MonoBehaviour
     {
         if (ActiveCampaign.Instance.pointGive)
         {
-            if (characterData.points < 5)
+            if (characterData.points < 5 && characterData.level < 10)
             {
                 characterData.points++;
                 SetPoints();
@@ -164,9 +171,13 @@ public class CharacterCard : MonoBehaviour
                     ActiveCampaign.Instance.pointGive = false;
                 });
             }
-            else
+            else if (characterData.points == 5)
             {
                 UIManager.Instance.Warning(characterData.name + " must level up before more points can be awarded");
+            }
+            else if (characterData.level == 10)
+            {
+                UIManager.Instance.Warning(characterData.name + " is aalready at max level and cannot be given more points");
             }
         }
     }
