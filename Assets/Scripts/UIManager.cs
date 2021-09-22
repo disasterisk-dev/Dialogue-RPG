@@ -93,7 +93,11 @@ public class UIManager : MonoBehaviour
                 break;
             case 1:
                 cautionText.text = "Warning! \n\n This player will lose their character and all progress from this campaign";
-                cautionButton.onClick.AddListener(() => ActiveCampaign.Instance.Kick());
+                cautionButton.onClick.AddListener(() => ActiveCampaign.Instance.Kick(ActiveCampaign.Instance.kickField.text));
+                break;
+            case 2:
+                cautionText.text = "Warning! \n\n You will not be able to rejoin unless invited and will lose this character permanently";
+                cautionButton.onClick.AddListener(() => ActiveCampaign.Instance.Kick(PlayerData.Instance.user.username));
                 break;
             default:
                 cautionButton.onClick.AddListener(() => Okay());

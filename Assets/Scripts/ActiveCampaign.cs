@@ -63,21 +63,22 @@ public class ActiveCampaign : MonoBehaviour
 
         gmDrawer.SetActive(isGM);
 
-        if (!isGM)
+        foreach (GameObject option in options) { option.SetActive(false); }
+
+        int optionLoad = isGM ? 5 : 3;
+
+        for (int i = 0; i < optionLoad; i++)
         {
-            foreach (GameObject o in options)
-            {
-                o.SetActive(false);
-            }
-            options[0].SetActive(true);
-            options[1].SetActive(true);
+            options[i].SetActive(true);
+        }
+
+        if (isGM)
+        {
+            options[2].GetComponent<Button>().onClick.AddListener(() => UIManager.Instance.Caution(0));
         }
         else
         {
-            foreach (GameObject o in options)
-            {
-                o.SetActive(true);
-            }
+            options[2].GetComponent<Button>().onClick.AddListener(() => UIManager.Instance.Caution(2));
         }
 
         title.text = activeCampaign.title;
@@ -269,9 +270,9 @@ public class ActiveCampaign : MonoBehaviour
 
     }
 
-    public void Kick()
+    public void Kick(string player)
     {
-        string playerToKick = kickField.text;
+        string playerToKick = player;
         int playerRef = activeCampaign.playerNames.IndexOf(playerToKick);
         string playerId = activeCampaign.playerIds[playerRef];
 

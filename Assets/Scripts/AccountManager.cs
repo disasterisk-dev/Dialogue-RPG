@@ -128,23 +128,30 @@ public class AccountManager : MonoBehaviour
     {
         if (usernameRegisterField.text != "" && emailRegisterField.text != "" && passwordRegisterField.text != "" && passwordRegisterVerifyField.text != "")
         {
-            if (passwordRegisterField.text.Length >= 8)
+            if (!usernameRegisterField.text.Contains(" "))
             {
-                if (passwordRegisterField.text == passwordRegisterVerifyField.text)
+                if (passwordRegisterField.text.Length >= 8)
                 {
-                    user.username = usernameRegisterField.text;
-                    user.email = emailRegisterField.text;
+                    if (passwordRegisterField.text == passwordRegisterVerifyField.text)
+                    {
+                        user.username = usernameRegisterField.text;
+                        user.email = emailRegisterField.text;
 
-                    SignUp(emailRegisterField.text, usernameRegisterField.text, passwordRegisterField.text);
+                        SignUp(emailRegisterField.text, usernameRegisterField.text, passwordRegisterField.text);
+                    }
+                    else
+                    {
+                        UIManager.Instance.Warning("Passwords do not match");
+                    }
                 }
                 else
                 {
-                    UIManager.Instance.Warning("Passwords do not match");
+                    UIManager.Instance.Warning("Password is not long enough, must be at least 8 characters");
                 }
             }
             else
             {
-                UIManager.Instance.Warning("Password is not long enough, must be at least 8 characters");
+                UIManager.Instance.Warning("Username cannot contain spaces");
             }
         }
         else
