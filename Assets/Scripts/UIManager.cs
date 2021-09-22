@@ -40,6 +40,10 @@ public class UIManager : MonoBehaviour
     [Header("Invite Dialogue")]
     public GameObject InviteDialogue;
 
+    [Header("Kick Dialogue")]
+    public GameObject KickDialogue;
+    public Button KickButton;
+
     Campaigns campaigns;
 
     private void Awake()
@@ -59,6 +63,7 @@ public class UIManager : MonoBehaviour
         cautionDialogue.SetActive(false);
         levelUpDialogue.SetActive(false);
         InviteDialogue.SetActive(false);
+        KickDialogue.SetActive(false);
 
         foreach (GameObject obj in screens)
         {
@@ -86,6 +91,10 @@ public class UIManager : MonoBehaviour
                 cautionText.text = "Warning! \n\n This campaign will be permanently deleted and all players will lose access";
                 cautionButton.onClick.AddListener(() => ActiveCampaign.Instance.Delete());
                 break;
+            case 1:
+                cautionText.text = "Warning! \n\n This player will lose their character and all progress from this campaign";
+                cautionButton.onClick.AddListener(() => ActiveCampaign.Instance.Kick());
+                break;
             default:
                 cautionButton.onClick.AddListener(() => Okay());
                 break;
@@ -97,6 +106,11 @@ public class UIManager : MonoBehaviour
     public void Invite()
     {
         InviteDialogue.SetActive(true);
+    }
+
+    public void Kick()
+    {
+        KickDialogue.SetActive(true);
     }
 
     public void Roll(string stat, float roll, float statValue)
@@ -125,14 +139,20 @@ public class UIManager : MonoBehaviour
 
         increase.onClick.AddListener(() =>
         {
-            tempValue = statValue + 1;
-            levelNum.text = tempValue.ToString();
+            if (statValue < 5)
+            {
+                tempValue = statValue + 1;
+                levelNum.text = tempValue.ToString();
+            }
         });
 
         decrease.onClick.AddListener(() =>
         {
-            tempValue = statValue - 1;
-            levelNum.text = tempValue.ToString();
+            if (statValue > -5)
+            {
+                tempValue = statValue - 1;
+                levelNum.text = tempValue.ToString();
+            }
         });
 
         levelOkay.onClick.AddListener(() =>
@@ -170,5 +190,6 @@ public class UIManager : MonoBehaviour
         cautionDialogue.SetActive(false);
         levelUpDialogue.SetActive(false);
         InviteDialogue.SetActive(false);
+        KickDialogue.SetActive(false);
     }
 }

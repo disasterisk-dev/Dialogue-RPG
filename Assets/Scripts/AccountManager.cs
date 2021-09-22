@@ -144,7 +144,7 @@ public class AccountManager : MonoBehaviour
             }
             else
             {
-                UIManager.Instance.Warning("Password is not long enough");
+                UIManager.Instance.Warning("Password is not long enough, must be at least 8 characters");
             }
         }
         else

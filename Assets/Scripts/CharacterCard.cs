@@ -142,13 +142,13 @@ public class CharacterCard : MonoBehaviour
                     UIManager.Instance.LevelUp("Word", characterData.word, this);
                     break;
                 case "wit":
-                    UIManager.Instance.LevelUp("Wit", characterData.word, this);
+                    UIManager.Instance.LevelUp("Wit", characterData.wit, this);
                     break;
                 case "will":
-                    UIManager.Instance.LevelUp("Will", characterData.word, this);
+                    UIManager.Instance.LevelUp("Will", characterData.will, this);
                     break;
                 case "want":
-                    UIManager.Instance.LevelUp("Want", characterData.word, this);
+                    UIManager.Instance.LevelUp("Want", characterData.want, this);
                     break;
             }
         }

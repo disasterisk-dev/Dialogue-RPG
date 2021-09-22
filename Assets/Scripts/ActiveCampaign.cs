@@ -29,8 +29,11 @@ public class ActiveCampaign : MonoBehaviour
     public GameObject gmDrawer;
     public GameObject discard;
     public GameObject cardBlock;
-    public TMP_InputField inviteField;
     public GameObject[] cardButtons;
+
+    [Header("Invite and Kick")]
+    public TMP_InputField inviteField;
+    public TMP_InputField kickField;
 
     [Header("Prefabs")]
     public GameObject newCharacter;
@@ -60,9 +63,9 @@ public class ActiveCampaign : MonoBehaviour
 
         gmDrawer.SetActive(isGM);
 
-        if(!isGM)
+        if (!isGM)
         {
-            foreach(GameObject o in options)
+            foreach (GameObject o in options)
             {
                 o.SetActive(false);
             }
@@ -71,7 +74,7 @@ public class ActiveCampaign : MonoBehaviour
         }
         else
         {
-            foreach(GameObject o in options)
+            foreach (GameObject o in options)
             {
                 o.SetActive(true);
             }
@@ -244,6 +247,75 @@ public class ActiveCampaign : MonoBehaviour
         }
     }
 
+    public void CheckKick()
+    {
+        bool playerFound = false;
+
+        foreach (string player in activeCampaign.playerNames)
+        {
+            if (player == kickField.text)
+            {
+                playerFound = true;
+                UIManager.Instance.Caution(1);
+                break;
+            }
+        }
+
+        if (!playerFound)
+        {
+            UIManager.Instance.Warning("No player found with that username.");
+            kickField.text = "";
+        }
+
+    }
+
+    public void Kick()
+    {
+        string playerToKick = kickField.text;
+        int playerRef = activeCampaign.playerNames.IndexOf(playerToKick);
+        string playerId = activeCampaign.playerIds[playerRef];
+
+        //delete character from campaign
+        foreach (Character c in activeCampaign.characters)
+        {
+            if (c.id == activeCampaign.playerIds[playerRef])
+            {
+                activeCampaign.characters.Remove(c);
+                break;
+            }
+        }
+        //delete player from campaign
+        activeCampaign.playerIds.RemoveAt(playerRef);
+        activeCampaign.playerNames.RemoveAt(playerRef);
+
+        RestClient.Put(AccountManager.Instance.uri + "/campaigns/" + activeCampaign.key + ".json?auth=" + AccountManager.Instance.idToken, activeCampaign)
+        .Then(response =>
+        {
+            //delete campaign from player database
+            RestClient.Get<User>(AccountManager.Instance.uri + "/users/" + playerId + ".json?auth=" + AccountManager.Instance.idToken)
+            .Then(uResponse =>
+            {
+                User tempUser = uResponse;
+                tempUser.campaigns.Remove(activeCampaign.key);
+
+                RestClient.Put(AccountManager.Instance.uri + "/users/" + playerId + ".json?auth=" + AccountManager.Instance.idToken, tempUser)
+                .Catch(error3 =>
+                {
+                    UIManager.Instance.Warning("Issue removing user from campaign\nError: " + error3.Message);
+                });
+
+            }).Catch(error2 =>
+            {
+                UIManager.Instance.Warning("Issue removing user from campaign\nError: " + error2.Message);
+            });
+        })
+        .Catch(error =>
+        {
+            UIManager.Instance.Warning("Couldn't kick player \nError: " + error.Message);
+        });
+
+
+    }
     void LoadCharacters()
     {
         foreach (GameObject obj in zones)
