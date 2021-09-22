@@ -121,7 +121,7 @@ public class AccountManager : MonoBehaviour
 
     void Post()
     {
-        RestClient.Put(uri + "users/" + localId + ".json?auth=" + idToken, user);
+        RestClient.Put(uri + "/users/" + localId + ".json?auth=" + idToken, user);
     }
 
     public void RegisterButton()

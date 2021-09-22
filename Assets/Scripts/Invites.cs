@@ -17,8 +17,22 @@ public class Invites : MonoBehaviour
     void OnEnable()
     {
         PlayerData.Instance.invites.Clear();
+        RestClient.Get(AccountManager.Instance.uri + "/users.json?auth=" + AccountManager.Instance.idToken)
+        .Then(uResponse =>
+        {
+            Debug.Log(uResponse.Text);
+            fsData userData = fsJsonParser.Parse(uResponse.Text);
+            Dictionary<string, User> users = null;
+            serializer.TryDeserialize(userData, ref users);
 
-        RestClient.Get(AccountManager.Instance.uri + "/campaigns.json?auth=" + AccountManager.Instance.idToken)
+            if(users.ContainsKey(PlayerData.Instance.user.localId))
+            {
+                PlayerData.Instance.user = users[PlayerData.Instance.user.localId];
+            }
+
+            //PlayerData.Instance.user = users[PlayerData.Instance.user.localId];
+
+            RestClient.Get(AccountManager.Instance.uri + "/campaigns.json?auth=" + AccountManager.Instance.idToken)
             .Then(response =>
             {
                 fsData campaignData = fsJsonParser.Parse(response.Text);
@@ -40,6 +54,12 @@ public class Invites : MonoBehaviour
 
                 Refresh();
             });
+        }).Catch(uError =>
+        {
+            Debug.Log("Couldn't get user for invites: " + uError);
+        });
+
+        
     }
     public void Refresh()
     {
