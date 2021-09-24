@@ -32,6 +32,8 @@ public class InvitationCard : MonoBehaviour
     {
         Campaign joinCamp;
 
+        if(PlayerData.Instance.user.campaigns == null){PlayerData.Instance.user.campaigns = new List<string>();}
+
         if (PlayerData.Instance.user.campaigns.Count < 4)
         {
             RestClient.Get<Campaign>(AccountManager.Instance.uri + "/campaigns/" + key + "/.json?auth=" + AccountManager.Instance.idToken)
